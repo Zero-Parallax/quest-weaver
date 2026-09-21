@@ -33,7 +33,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.value }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           import json, os
           version = os.environ["VERSION"]
           url = os.environ["REPO_URL"]
@@ -57,7 +57,7 @@ jobs:
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
           cd quest-weaver && zip -r ../quest-weaver.zip . -x '*.git*' && cd ..
-          python - <<'PY'
+          python3 - <<'PY'
           import json, os
           version = os.environ["VERSION"]
           url = os.environ["REPO_URL"]
@@ -74,6 +74,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: Quest Weaver ${{ steps.version.outputs.value }}
+          # A tag like v0.1.0-beta.1 publishes as a prerelease, so nobody
+          # mistakes an early build for a finished one.
+          prerelease: ${{ contains(steps.version.outputs.value, '-') }}
           body: |
             Install in Foundry with this manifest URL:
 

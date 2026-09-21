@@ -1,6 +1,10 @@
 # Build output
 dist/
 
+# The release workflow writes a published manifest here on the runner.
+# The real one lives at quest-weaver/module.json.
+/module.json
+
 # Editor and OS noise
 .vscode/
 .idea/
