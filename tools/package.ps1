@@ -24,6 +24,14 @@ $module = Join-Path $root "quest-weaver"
 $dist = Join-Path $root "dist"
 $manifestPath = Join-Path $module "module.json"
 
+# Windows PowerShell's `Set-Content -Encoding UTF8` writes a byte order mark.
+# Foundry parses module.json with JSON.parse, which rejects a leading BOM with
+# "Unexpected token", so every write here goes through this instead.
+function Write-Utf8NoBom([string]$Path, [string]$Text) {
+  [System.IO.File]::WriteAllText($Path, $Text, (New-Object System.Text.UTF8Encoding $false))
+}
+
+
 if (-not $SkipChecks) {
   Write-Host "Running static checks..." -ForegroundColor Cyan
   & (Join-Path $PSScriptRoot "check.ps1") | Out-Null
@@ -46,7 +54,7 @@ if ($manifest.url -match "YOUR-GITHUB-USERNAME") {
 # The copy inside the zip is pinned to this exact version.
 $manifest.manifest = "$($manifest.url)/releases/download/v$Version/module.json"
 $manifest.download = "$($manifest.url)/releases/download/v$Version/quest-weaver.zip"
-$manifest | ConvertTo-Json -Depth 20 | Set-Content $manifestPath -Encoding UTF8
+Write-Utf8NoBom $manifestPath ($manifest | ConvertTo-Json -Depth 20)
 
 if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
 New-Item -ItemType Directory -Path $dist | Out-Null
@@ -79,7 +87,7 @@ try {
 $published = Get-Content $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $published.manifest = "$($published.url)/releases/latest/download/module.json"
 $published.download = "$($published.url)/releases/download/v$Version/quest-weaver.zip"
-$published | ConvertTo-Json -Depth 20 | Set-Content (Join-Path $dist "module.json") -Encoding UTF8
+Write-Utf8NoBom (Join-Path $dist "module.json") ($published | ConvertTo-Json -Depth 20)
 
 $size = [math]::Round((Get-Item $zipPath).Length / 1KB, 1)
 Write-Host ""

@@ -20,6 +20,27 @@ foreach ($f in $jsonFiles) {
   catch { Fail "$($f.Name): $($_.Exception.Message)" }
 }
 
+Write-Host "`n[1b] No byte order marks" -ForegroundColor Cyan
+# PowerShell's ConvertFrom-Json happily eats a BOM, but Foundry parses
+# module.json with JSON.parse, which rejects one outright. A BOM therefore
+# passes every check above and then breaks the module on load, so test bytes.
+$bomFiles = @()
+$skipDirs = @(".git", "dist")
+foreach ($f in Get-ChildItem $root -Recurse -File -Include *.json, *.md, *.js, *.hbs, *.css) {
+  $parts = $f.FullName.Split([System.IO.Path]::DirectorySeparatorChar)
+  if ($parts | Where-Object { $skipDirs -contains $_ }) { continue }
+  $fs = [System.IO.File]::OpenRead($f.FullName)
+  try {
+    $head = New-Object byte[] 3
+    $read = $fs.Read($head, 0, 3)
+  } finally { $fs.Dispose() }
+  if ($read -eq 3 -and $head[0] -eq 0xEF -and $head[1] -eq 0xBB -and $head[2] -eq 0xBF) {
+    $bomFiles += $f.FullName.Substring($root.Length + 1)
+  }
+}
+if ($bomFiles.Count -eq 0) { Pass "no BOMs" }
+else { foreach ($b in $bomFiles) { Fail "$b starts with a UTF-8 BOM - Foundry cannot parse this" } }
+
 $js  = @(Get-ChildItem (Join-Path $mod "scripts") -Filter *.js -Recurse -File)
 $hbs = @(Get-ChildItem (Join-Path $mod "templates") -Filter *.hbs -Recurse -File -ErrorAction SilentlyContinue)
 $jsText  = ($js  | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"

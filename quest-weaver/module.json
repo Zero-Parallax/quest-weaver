@@ -1,4 +1,4 @@
-﻿{
+{
     "id":  "quest-weaver",
     "title":  "Quest Weaver",
     "description":  "System-agnostic quest log, job board and GM story web for Foundry VTT. Quests are real documents, so secrets stay on the server side of the wire.",

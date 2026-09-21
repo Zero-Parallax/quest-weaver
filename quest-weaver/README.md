@@ -1,4 +1,4 @@
-﻿# Quest Weaver
+# Quest Weaver
 
 A system-agnostic quest log, job board and GM story web for **Foundry VTT v14**.
 
