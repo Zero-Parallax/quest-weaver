@@ -74,6 +74,12 @@ export class QuestPageSheet extends JournalEntryPageHandlebarsSheet {
     },
   };
 
+  /**
+   * Set when a save is refused, so pressing Save over a validation error does
+   * not close the sheet and lose the GM's place.
+   */
+  #saveRefused = false;
+
   /** The quest facade for this page, re-wrapped on every access. */
   get quest() {
     return Quest.wrap(this.document);
@@ -500,6 +506,21 @@ export class QuestPageSheet extends JournalEntryPageHandlebarsSheet {
    * vault page, everything else goes to the quest page as normal.
    */
   /**
+   * Close the sheet when Save is pressed.
+   *
+   * The sheet also submits on every field change, and those arrive here as
+   * "change" events. Foundry's own `closeOnSubmit` cannot tell the two apart,
+   * so it would shut the window as soon as you edited anything; checking the
+   * event type is what separates a deliberate Save from an autosave.
+   */
+  /** @inheritDoc */
+  async _onSubmitForm(formConfig, event) {
+    this.#saveRefused = false;
+    await super._onSubmitForm(formConfig, event);
+    if (event?.type === "submit" && !this.#saveRefused) await this.close({ submitted: true });
+  }
+
+  /**
    * Checks run before Foundry's, so the GM gets a sentence they can act on
    * instead of the schema's wording.
    */
@@ -519,6 +540,7 @@ export class QuestPageSheet extends JournalEntryPageHandlebarsSheet {
    * the short version of the message.
    */
   #refuse(problems) {
+    this.#saveRefused = true;
     reportProblems(problems);
     setTimeout(() => this.render(), 0);
     throw new Error(problems.join(" "));
