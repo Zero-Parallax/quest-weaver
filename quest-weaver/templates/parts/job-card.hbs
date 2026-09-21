@@ -23,11 +23,17 @@
   </header>
 
   {{#if @root.isGM}}
+  {{#unless this.posted}}
+  <button type="button" class="qw-card-warning" data-action="togglePosted">
+    <i class="fa-solid fa-thumbtack"></i> {{localize "QW.Log.NotPostedYet"}}
+  </button>
+  {{else}}
   {{#if this.isHidden}}
   <button type="button" class="qw-card-warning" data-action="toggleVisibility">
     <i class="fa-solid fa-eye-slash"></i> {{localize "QW.Log.PostedButHidden"}}
   </button>
   {{/if}}
+  {{/unless}}
   {{/if}}
 
   {{#if this.summary}}

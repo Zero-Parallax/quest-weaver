@@ -59,6 +59,7 @@ export class QuestLogApp extends HandlebarsApplicationMixin(ApplicationV2) {
       abandonQuest: QuestLogApp.#onAbandonQuest,
       toggleMilestone: QuestLogApp.#onToggleMilestone,
       toggleVisibility: QuestLogApp.#onToggleVisibility,
+      togglePosted: QuestLogApp.#onTogglePosted,
       deleteQuest: QuestLogApp.#onDeleteQuest,
       awardQuest: QuestLogApp.#onAwardQuest,
       openImportExport: QuestLogApp.#onOpenImportExport,
@@ -131,7 +132,13 @@ export class QuestLogApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const drafts = isGM ? all.filter((q) => q.status === STATUS.draft) : [];
 
     const byTab = {
-      board: all.filter((q) => q.system.posted && !Status.isTerminal(q.status)),
+      // A GM also sees quests marked available but not yet posted. Without
+      // that they match no tab at all and appear to have vanished on save.
+      board: all.filter((q) => {
+        if (Status.isTerminal(q.status)) return false;
+        if (q.system.posted) return true;
+        return isGM && q.status === STATUS.available;
+      }),
       [STATUS.active]: all.filter((q) => q.status === STATUS.active),
       [STATUS.completed]: all.filter((q) => q.status === STATUS.completed),
       [STATUS.failed]: all.filter((q) => q.status === STATUS.failed),
@@ -202,6 +209,7 @@ export class QuestLogApp extends HandlebarsApplicationMixin(ApplicationV2) {
         .map((uuid) => fromUuidSync(uuid))
         .filter(Boolean)
         .map((a) => ({ name: a.name, img: a.img })),
+      posted: s.posted,
       suggestedBy: s.suggested.by,
       suggestedReward: s.suggested.reward,
       isHidden: quest.isHidden,
@@ -449,6 +457,13 @@ export class QuestLogApp extends HandlebarsApplicationMixin(ApplicationV2) {
     } catch (err) {
       ui.notifications.warn(err.message);
     }
+    this.render();
+  }
+
+  static async #onTogglePosted(event, target) {
+    const quest = QuestLogApp.#questFor(target);
+    if (!quest) return;
+    await quest.page.update({ "system.posted": !quest.system.posted });
     this.render();
   }
 

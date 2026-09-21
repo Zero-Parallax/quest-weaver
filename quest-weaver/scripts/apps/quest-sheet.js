@@ -7,7 +7,7 @@
  * marked, and the padlock on each row moves it across.
  */
 
-import { MODULE_ID, OWNERSHIP, STATUS_META, TYPE } from "../config.js";
+import { MODULE_ID, OWNERSHIP, STATUS, STATUS_META, TYPE } from "../config.js";
 import { Quest, QuestRepository, rewardUpdates } from "../core/quest-repository.js";
 import { Reveal } from "../core/reveal.js";
 import { SecretsModel } from "../data/secrets-model.js";
@@ -517,7 +517,44 @@ export class QuestPageSheet extends JournalEntryPageHandlebarsSheet {
   async _onSubmitForm(formConfig, event) {
     this.#saveRefused = false;
     await super._onSubmitForm(formConfig, event);
-    if (event?.type === "submit" && !this.#saveRefused) await this.close({ submitted: true });
+    if (event?.type === "submit" && !this.#saveRefused) {
+      this.#announceSave();
+      await this.close({ submitted: true });
+    }
+  }
+
+  /**
+   * Say where the quest ended up.
+   *
+   * A new quest starts as a hidden draft, so without this it saves, the sheet
+   * closes, and nothing visibly happens: the quest is sitting in a GM-only tab
+   * the author may not have opened yet.
+   */
+  #announceSave() {
+    const quest = this.quest;
+    const s = quest.system;
+
+    let where;
+    if (s.status === STATUS.available) {
+      where = game.i18n.localize(s.posted ? "QW.Save.Where.board" : "QW.Save.Where.boardUnposted");
+    } else {
+      where = game.i18n.localize(`QW.Save.Where.${s.status}`);
+    }
+
+    const audience = quest.audience;
+    let who;
+    if (quest.isHidden) who = game.i18n.localize("QW.Save.Who.hidden");
+    else if ((quest.entry.ownership?.default ?? 0) >= OWNERSHIP.OBSERVER) {
+      who = game.i18n.localize("QW.Save.Who.all");
+    } else {
+      who = game.i18n.format("QW.Save.Who.some", {
+        names: audience.map((u) => u.name).join(", "),
+      });
+    }
+
+    ui.notifications.info(
+      game.i18n.format("QW.Save.Announce", { name: quest.name, where, who }),
+    );
   }
 
   /**

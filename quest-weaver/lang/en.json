@@ -315,5 +315,17 @@
   "QW.Validate.BadChoice": "is not one of the allowed values",
   "QW.Validate.Unknown": "Something in the quest could not be saved.",
   "QW.Validate.Field.name": "Quest name",
-  "QW.Validate.NeedsNameProposal": "Your quest needs a title before it can be sent to the GM."
+  "QW.Validate.NeedsNameProposal": "Your quest needs a title before it can be sent to the GM.",
+  "QW.Save.Announce": "\"{name}\" saved to {where}. {who}",
+  "QW.Save.Where.draft": "Drafts",
+  "QW.Save.Where.board": "the Job Board",
+  "QW.Save.Where.boardUnposted": "the Job Board, but not posted yet",
+  "QW.Save.Where.active": "Active",
+  "QW.Save.Where.completed": "Completed",
+  "QW.Save.Where.failed": "Failed",
+  "QW.Save.Where.abandoned": "Abandoned",
+  "QW.Save.Who.hidden": "Only you can see it.",
+  "QW.Save.Who.all": "Visible to all players.",
+  "QW.Save.Who.some": "Visible to {names}.",
+  "QW.Log.NotPostedYet": "Not on the Job Board yet, click to post it"
 }

@@ -12,6 +12,9 @@
 import { FLAG, LOG, MODULE_ID, OWNERSHIP, SETTING, TYPE } from "../config.js";
 
 export class Vault {
+  /** Quest UUIDs whose vault page is mid-delete. */
+  static #purging = new Set();
+
   /** The vault entry, or null if it has not been created yet. */
   static get entry() {
     return game.journal?.find((j) => j.getFlag(MODULE_ID, FLAG.isVault) === true) ?? null;
@@ -90,9 +93,27 @@ export class Vault {
   /**
    * Remove a quest's secrets page. Called when the quest itself is deleted, so
    * the vault does not accumulate orphans.
+   *
+   * Two things can ask for this at once: the preDelete hook, which also covers
+   * a quest deleted straight from the sidebar, and QuestRepository.delete. The
+   * hook does not await, so both can look up the page before either removes it
+   * and the second delete then fails on a document that is already gone. The
+   * in-flight set makes the second call a no-op.
    */
   static async purgeSecrets(questUuid) {
+    if (!game.user.isGM || Vault.#purging.has(questUuid)) return;
+
     const page = Vault.secretsFor(questUuid);
-    if (page && game.user.isGM) await page.delete();
+    if (!page) return;
+
+    Vault.#purging.add(questUuid);
+    try {
+      await page.delete();
+    } catch (err) {
+      // Something else removed it first, which is the outcome we wanted anyway.
+      console.debug(`${LOG} vault page for ${questUuid} was already removed`);
+    } finally {
+      Vault.#purging.delete(questUuid);
+    }
   }
 }
