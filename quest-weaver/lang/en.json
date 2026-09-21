@@ -306,5 +306,14 @@
   "QW.Web.NodeKind": "Kind",
   "QW.Web.NodeNotes": "Notes",
   "QW.Control.StoryWeb": "Story Web",
-  "QW.Keybind.OpenWeb": "Open the Story Web"
+  "QW.Keybind.OpenWeb": "Open the Story Web",
+  "QW.Validate.Title": "This quest cannot be saved yet",
+  "QW.Validate.Intro": "Please fix the following and try again:",
+  "QW.Validate.Close": "Close",
+  "QW.Validate.NeedsName": "The quest needs a name. Type one in the box at the top of the sheet.",
+  "QW.Validate.MustNotBeEmpty": "must not be empty",
+  "QW.Validate.BadChoice": "is not one of the allowed values",
+  "QW.Validate.Unknown": "Something in the quest could not be saved.",
+  "QW.Validate.Field.name": "Quest name",
+  "QW.Validate.NeedsNameProposal": "Your quest needs a title before it can be sent to the GM."
 }

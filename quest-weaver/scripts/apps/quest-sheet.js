@@ -14,6 +14,7 @@ import { SecretsModel } from "../data/secrets-model.js";
 import { newId } from "../data/fields.js";
 import { denominations, difficultyOptions } from "../settings.js";
 import { enrich } from "../ui/enrich.js";
+import { describeValidationError, reportProblems } from "../ui/validation.js";
 import { AwardDialog } from "./award-dialog.js";
 
 const { JournalEntryPageHandlebarsSheet } = foundry.applications.sheets.journal;
@@ -498,8 +499,37 @@ export class QuestPageSheet extends JournalEntryPageHandlebarsSheet {
    * Split the form data: GM notes and vault coin amounts are written to the
    * vault page, everything else goes to the quest page as normal.
    */
+  /**
+   * Checks run before Foundry's, so the GM gets a sentence they can act on
+   * instead of the schema's wording.
+   */
+  #ownChecks(data) {
+    const problems = [];
+    if ("name" in data && !String(data.name ?? "").trim()) {
+      problems.push(game.i18n.localize("QW.Validate.NeedsName"));
+    }
+    return problems;
+  }
+
+  /**
+   * Explain what is wrong, put the form back, and abandon the save.
+   *
+   * The document was never changed, so re-rendering restores the fields. The
+   * throw is what stops Foundry proceeding; its own notification then repeats
+   * the short version of the message.
+   */
+  #refuse(problems) {
+    reportProblems(problems);
+    setTimeout(() => this.render(), 0);
+    throw new Error(problems.join(" "));
+  }
+
   /** @inheritDoc */
   _prepareSubmitData(event, form, formData, updateData) {
+    // Validate before touching the vault, so a refused save does not half-apply.
+    const problems = this.#ownChecks(formData.object);
+    if (problems.length) this.#refuse(problems);
+
     const vault = {};
 
     const gmNotes = formData.object["secrets.system.gmNotes"];
@@ -528,7 +558,13 @@ export class QuestPageSheet extends JournalEntryPageHandlebarsSheet {
         ui.notifications.error(game.i18n.localize("QW.Error.VaultWrite")),
       );
     }
-    return super._prepareSubmitData(event, form, formData, updateData);
+
+    try {
+      return super._prepareSubmitData(event, form, formData, updateData);
+    } catch (err) {
+      // Anything the checks above did not anticipate still gets explained.
+      return this.#refuse(describeValidationError(err, this.document));
+    }
   }
 }
 

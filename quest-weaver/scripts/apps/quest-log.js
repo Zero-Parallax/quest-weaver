@@ -392,7 +392,13 @@ export class QuestLogApp extends HandlebarsApplicationMixin(ApplicationV2) {
       },
       rejectClose: false,
     });
-    if (!data?.name?.trim()) return;
+    if (!data) return; // Cancelled.
+    if (!data.name?.trim()) {
+      const { reportProblems } = await import("../ui/validation.js");
+      return reportProblems([game.i18n.localize("QW.Validate.NeedsNameProposal")], {
+        title: "QW.Propose.Title",
+      });
+    }
 
     try {
       await QuestSocket.request("proposeQuest", data);

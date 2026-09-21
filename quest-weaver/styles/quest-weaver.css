@@ -1723,3 +1723,21 @@
 .qw-web-menu button:hover {
   background: rgba(127, 127, 140, 0.22);
 }
+
+/* ---------- Validation report ---------- */
+
+.quest-weaver .qw-validate-body p {
+  margin: 0 0 0.4rem;
+}
+
+.quest-weaver .qw-validate-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quest-weaver .qw-validate-list li {
+  line-height: 1.35;
+}
