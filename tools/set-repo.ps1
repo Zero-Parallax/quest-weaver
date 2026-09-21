@@ -26,14 +26,16 @@ function Write-Utf8NoBom([string]$Path, [string]$Text) {
 
 $url = "https://github.com/$Owner/$Repo"
 $manifest = Get-Content $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-$manifest.url      = $url
-$manifest.bugs     = "$url/issues"
-$manifest.manifest = "$url/releases/latest/download/module.json"
-$manifest.download = "$url/releases/download/v$($manifest.version)/quest-weaver.zip"
+$manifest.url       = $url
+$manifest.bugs      = "$url/issues"
+$manifest.readme    = "$url#readme"
+$manifest.changelog = "$url/blob/main/CHANGELOG.md"
+$manifest.manifest  = "$url/releases/latest/download/module.json"
+$manifest.download  = "$url/releases/download/v$($manifest.version)/quest-weaver.zip"
 Write-Utf8NoBom $manifestPath ($manifest | ConvertTo-Json -Depth 20)
 
 # Keep the README's install link in step with the manifest.
-$readmePath = Join-Path $root "quest-weaver\README.md"
+$readmePath = Join-Path $root "README.md"
 if (Test-Path $readmePath) {
   $readme = (Get-Content $readmePath -Raw -Encoding UTF8) `
     -replace "https://github\.com/[^/\s)]+/quest-weaver", $url

@@ -61,10 +61,10 @@
                       },
     "socket":  true,
     "license":  "MIT",
-    "readme":  "README.md",
+    "readme":  "https://github.com/Zero-Parallax/quest-weaver#readme",
     "url":  "https://github.com/Zero-Parallax/quest-weaver",
     "bugs":  "https://github.com/Zero-Parallax/quest-weaver/issues",
     "manifest":  "https://github.com/Zero-Parallax/quest-weaver/releases/download/v0.1.0/module.json",
     "download":  "https://github.com/Zero-Parallax/quest-weaver/releases/download/v0.1.0/quest-weaver.zip",
-    "changelog":  "https://github.com/YOUR-GITHUB-USERNAME/quest-weaver/blob/main/CHANGELOG.md"
+    "changelog":  "https://github.com/Zero-Parallax/quest-weaver/blob/main/CHANGELOG.md"
 }

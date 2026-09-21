@@ -79,6 +79,17 @@ try {
     [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
       $archive, $file.FullName, $entryName) | Out-Null
   }
+
+  # README, LICENSE and CHANGELOG live at the repository root so GitHub renders
+  # them on the front page, but a module people download should still carry its
+  # own licence and instructions, so they are copied in here.
+  foreach ($name in @("README.md", "LICENSE", "CHANGELOG.md")) {
+    $path = Join-Path $root $name
+    if (Test-Path $path) {
+      [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+        $archive, $path, $name) | Out-Null
+    }
+  }
 } finally {
   $archive.Dispose()
 }

@@ -92,7 +92,7 @@ dialog shows every quest it found, whether it will be created or updated, and an
 not understand. Re-importing the same file updates the quests it made last time instead of
 duplicating them, so you can iterate on a draft.
 
-The format is documented in [docs/quest-json-schema.md](../docs/quest-json-schema.md), and
+The format is documented in [docs/quest-json-schema.md](docs/quest-json-schema.md), and
 **Load the example** in the dialog pastes in a worked three-quest chain. It is deliberately simple
 enough to hand to an AI: ask for quests in that shape, paste the result, preview, import.
 
