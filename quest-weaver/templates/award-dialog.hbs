@@ -1,0 +1,150 @@
+<div class="qw-award-body">
+
+  <header class="qw-award-head">
+    <h2>{{quest.name}}</h2>
+    <p class="hint">{{localize "QW.Award.AdapterInUse"}} <strong>{{adapter.label}}</strong></p>
+  </header>
+
+  {{#each warnings}}
+  <p class="qw-award-warning"><i class="fa-solid fa-triangle-exclamation"></i> {{localize this}}</p>
+  {{/each}}
+
+  <fieldset>
+    <legend>{{localize "QW.Award.Recipients"}}</legend>
+    <ul class="qw-award-recipients">
+      {{#each plan.rows}}
+      <li>
+        {{#if this.img}}<img src="{{this.img}}" alt="{{this.name}}">{{/if}}
+        <span class="qw-award-name">{{this.name}}</span>
+        <button type="button" class="qw-icon-btn qw-danger" data-action="removeRecipient"
+                data-uuid="{{this.uuid}}" data-tooltip="{{localize 'QW.Award.Remove'}}">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </li>
+      {{/each}}
+    </ul>
+    {{#if candidates.length}}
+    <div class="qw-award-add">
+      <select>
+        {{#each candidates}}<option value="{{this.uuid}}">{{this.name}}</option>{{/each}}
+      </select>
+      <button type="button" class="qw-add-btn" data-action="addRecipient">
+        <i class="fa-solid fa-plus"></i> {{localize "QW.Award.Add"}}
+      </button>
+    </div>
+    {{/if}}
+  </fieldset>
+
+  {{#if hasCurrency}}
+  <fieldset>
+    <legend>{{localize "QW.Reward.Currency"}}: {{potLabel}}</legend>
+    <div class="qw-award-controls">
+      <label>
+        <span>{{localize "QW.Award.SplitMode"}}</span>
+        <select data-plan-input="currencyMode">
+          <option value="equal" {{#if (eq currencyMode "equal")}}selected{{/if}}>{{localize "QW.Award.SplitEqual"}}</option>
+          <option value="single" {{#if (eq currencyMode "single")}}selected{{/if}}>{{localize "QW.Award.SplitSingle"}}</option>
+        </select>
+      </label>
+      <label>
+        <span>{{localize "QW.Award.Remainder"}}</span>
+        <select data-plan-input="remainderTo">
+          <option value="spread" {{#if (eq remainderTo "spread")}}selected{{/if}}>{{localize "QW.Award.RemainderSpread"}}</option>
+          {{#each plan.rows}}
+          <option value="{{this.uuid}}" {{#if (eq this.uuid @root.remainderTo)}}selected{{/if}}>{{this.name}}</option>
+          {{/each}}
+        </select>
+      </label>
+    </div>
+  </fieldset>
+  {{/if}}
+
+  {{#if hasXP}}
+  <fieldset>
+    <legend>{{localize "QW.Reward.XP"}}: {{plan.totals.xp}}</legend>
+    <label>
+      <span>{{localize "QW.Award.XPMode"}}</span>
+      <select data-plan-input="xpMode">
+        <option value="divide" {{#if (eq xpMode "divide")}}selected{{/if}}>{{localize "QW.Award.XPDivide"}}</option>
+        <option value="each" {{#if (eq xpMode "each")}}selected{{/if}}>{{localize "QW.Award.XPEach"}}</option>
+      </select>
+    </label>
+  </fieldset>
+  {{/if}}
+
+  <fieldset>
+    <legend>{{localize "QW.Award.Preview"}}</legend>
+    <table class="qw-award-table">
+      <thead>
+        <tr>
+          <th>{{localize "QW.Award.Who"}}</th>
+          {{#if hasCurrency}}<th>{{localize "QW.Reward.Currency"}}</th>{{/if}}
+          {{#if hasXP}}<th>{{localize "QW.Reward.XP"}}</th>{{/if}}
+          <th>{{localize "QW.Award.Items"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each plan.rows}}
+        <tr>
+          <td class="qw-award-who">
+            {{#if this.img}}<img src="{{this.img}}" alt="">{{/if}}{{this.name}}
+          </td>
+          {{#if @root.hasCurrency}}
+          <td class="qw-award-num">{{#if this.currencyLabel}}{{this.currencyLabel}}{{else}}-{{/if}}</td>
+          {{/if}}
+          {{#if @root.hasXP}}
+          <td class="qw-award-num">{{#if this.xp}}{{this.xp}}{{else}}-{{/if}}</td>
+          {{/if}}
+          <td>
+            {{#each this.items}}
+            <span class="qw-reward-pill">
+              {{#if this.img}}<img src="{{this.img}}" alt="">{{/if}}{{this.name}}{{#if (gt this.qty 1)}} ×{{this.qty}}{{/if}}
+            </span>
+            {{/each}}
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </fieldset>
+
+  {{#if plan.totals.items}}
+  <fieldset>
+    <legend>{{localize "QW.Award.ItemAssignment"}}</legend>
+    <ul class="qw-award-items">
+      {{#each plan.rows}}
+      {{#each this.items}}
+      <li>
+        {{#if this.img}}<img src="{{this.img}}" alt="">{{/if}}
+        <span class="qw-award-name">{{this.name}}</span>
+        <select data-plan-input="itemAssignment" data-reward-id="{{this.id}}">
+          {{#each @root.plan.rows}}
+          <option value="{{this.uuid}}" {{#if (eq this.uuid ../../uuid)}}selected{{/if}}>{{this.name}}</option>
+          {{/each}}
+        </select>
+      </li>
+      {{/each}}
+      {{/each}}
+    </ul>
+  </fieldset>
+  {{/if}}
+
+  {{#if plan.custom.length}}
+  <fieldset>
+    <legend>{{localize "QW.Award.OtherRewards"}}</legend>
+    <ul class="qw-award-custom">
+      {{#each plan.custom}}
+      <li><i class="fa-solid fa-gift"></i> {{this.text}}</li>
+      {{/each}}
+    </ul>
+    <p class="hint">{{localize "QW.Award.OtherHint"}}</p>
+  </fieldset>
+  {{/if}}
+
+  <footer class="qw-award-foot">
+    <button type="button" class="qw-add-btn qw-accept" data-action="award" {{disabled (not canAward)}}>
+      <i class="fa-solid fa-sack-dollar"></i> {{localize "QW.Award.Confirm"}}
+    </button>
+  </footer>
+
+</div>

@@ -1,0 +1,36 @@
+{{!-- One editable milestone. The index drives the form name, so the whole row
+      must be submitted: id/trackId/order ride along as hidden inputs. --}}
+<li class="qw-ms-row {{#if this.hidden}}is-secret{{/if}}" data-milestone-id="{{this.id}}">
+
+  {{#unless this.hidden}}
+  <input type="hidden" name="system.milestones.{{this.idx}}.id" value="{{this.id}}">
+  <input type="hidden" name="system.milestones.{{this.idx}}.trackId" value="{{this.trackId}}">
+  <input type="hidden" name="system.milestones.{{this.idx}}.order" value="{{this.order}}">
+  <input type="hidden" name="system.milestones.{{this.idx}}.revealed" value="true">
+  <label class="qw-ms-done" data-tooltip="{{localize 'QW.Edit.Done'}}">
+    <input type="checkbox" name="system.milestones.{{this.idx}}.done" {{checked this.done}}>
+  </label>
+  <input class="qw-ms-text" type="text" name="system.milestones.{{this.idx}}.text"
+         value="{{this.text}}" placeholder="{{localize 'QW.Edit.MilestonePlaceholder'}}">
+  <input class="qw-ms-counter" type="number" name="system.milestones.{{this.idx}}.counter.value"
+         value="{{this.counter.value}}" data-tooltip="{{localize 'QW.Edit.CounterValue'}}">
+  <input class="qw-ms-counter" type="number" name="system.milestones.{{this.idx}}.counter.max"
+         value="{{this.counter.max}}" placeholder="-" data-tooltip="{{localize 'QW.Edit.CounterMax'}}">
+  {{else}}
+  {{!-- Vault rows are not part of the form; they are edited after revealing. --}}
+  <i class="fa-solid fa-square qw-ms-done is-disabled"></i>
+  <span class="qw-ms-text is-vault">{{this.text}}</span>
+  <span class="qw-vault-tag">{{localize "QW.Edit.InVault"}}</span>
+  {{/unless}}
+
+  <button type="button" class="qw-icon-btn" data-action="toggleMilestoneSecret"
+          data-milestone-id="{{this.id}}" data-secret="{{#if this.hidden}}true{{else}}false{{/if}}"
+          data-tooltip="{{#if this.hidden}}{{localize 'QW.Edit.RevealToPlayers'}}{{else}}{{localize 'QW.Edit.MoveToVault'}}{{/if}}">
+    <i class="fa-solid {{#if this.hidden}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+  </button>
+  <button type="button" class="qw-icon-btn qw-danger" data-action="deleteMilestone"
+          data-milestone-id="{{this.id}}" data-secret="{{#if this.hidden}}true{{else}}false{{/if}}"
+          data-tooltip="{{localize 'QW.Edit.Delete'}}">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</li>

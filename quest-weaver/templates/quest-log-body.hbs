@@ -1,0 +1,25 @@
+<div class="qw-tab-bodies">
+  {{#each sections}}
+  <section class="tab qw-tab-body {{#if this.active}}active{{/if}}"
+           data-group="primary" data-tab="{{this.id}}">
+
+    {{#if this.quests.length}}
+      {{#if this.isBoard}}
+      <div class="qw-board-grid">
+        {{#each this.quests}}{{> "modules/quest-weaver/templates/parts/job-card.hbs"}}{{/each}}
+      </div>
+      {{else}}
+      <ul class="qw-quest-list">
+        {{#each this.quests}}{{> "modules/quest-weaver/templates/parts/quest-row.hbs"}}{{/each}}
+      </ul>
+      {{/if}}
+    {{else}}
+      <p class="qw-empty">
+        <i class="fa-solid fa-feather"></i>
+        {{localize (concat "QW.Log.Empty." this.id)}}
+      </p>
+    {{/if}}
+
+  </section>
+  {{/each}}
+</div>

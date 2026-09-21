@@ -1,0 +1,137 @@
+<div class="qw-io-body">
+
+  <nav class="sheet-tabs tabs">
+    {{#each tabs}}
+    <a data-action="tab" data-group="{{this.group}}" data-tab="{{this.id}}"
+       class="{{this.cssClass}}">
+      {{#if this.icon}}<i class="{{this.icon}}" inert></i>{{/if}}
+      <span>{{localize this.label}}</span>
+    </a>
+    {{/each}}
+  </nav>
+
+  {{!-- ---------------- Import ---------------- --}}
+  <section class="tab qw-io-tab {{#if tabs.import.active}}active{{/if}}"
+           data-group="primary" data-tab="import">
+
+    <p class="hint">{{localize "QW.IO.ImportHint"}}</p>
+
+    <div class="qw-io-actions">
+      <input type="file" accept="application/json,.json" hidden>
+      <button type="button" class="qw-add-btn" data-action="pickFile">
+        <i class="fa-solid fa-folder-open"></i> {{localize "QW.IO.ChooseFile"}}
+      </button>
+      <button type="button" class="qw-add-btn" data-action="copyExample">
+        <i class="fa-solid fa-lightbulb"></i> {{localize "QW.IO.LoadExample"}}
+      </button>
+      {{#if text}}
+      <button type="button" class="qw-add-btn" data-action="clearInput">
+        <i class="fa-solid fa-xmark"></i> {{localize "QW.IO.Clear"}}
+      </button>
+      {{/if}}
+    </div>
+
+    <textarea name="qw-json" class="qw-io-json" rows="10"
+              placeholder="{{localize 'QW.IO.PastePlaceholder'}}">{{text}}</textarea>
+
+    <div class="qw-io-actions">
+      <button type="button" class="qw-add-btn" data-action="parse">
+        <i class="fa-solid fa-magnifying-glass"></i> {{localize "QW.IO.Preview"}}
+      </button>
+    </div>
+
+    {{#if parsed}}
+      {{#each parsed.errors}}
+      <p class="qw-io-error"><i class="fa-solid fa-circle-xmark"></i> {{this}}</p>
+      {{/each}}
+      {{#each parsed.warnings}}
+      <p class="qw-io-warning"><i class="fa-solid fa-triangle-exclamation"></i> {{this}}</p>
+      {{/each}}
+
+      {{#if plan.length}}
+      <fieldset>
+        <legend>
+          {{localize "QW.IO.WillDo"}}
+          <span class="qw-io-counts">
+            {{localize "QW.IO.CountCreate"}} {{counts.create}} ·
+            {{localize "QW.IO.CountUpdate"}} {{counts.update}}
+          </span>
+        </legend>
+        <table class="qw-io-table">
+          <thead>
+            <tr>
+              <th>{{localize "QW.IO.Quest"}}</th>
+              <th>{{localize "QW.IO.ActionHeader"}}</th>
+              <th>{{localize "QW.Quest.Milestones"}}</th>
+              <th>{{localize "QW.Quest.Rewards"}}</th>
+              <th>{{localize "QW.IO.Links"}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each plan}}
+            <tr class="qw-io-row is-{{this.action}}">
+              <td>
+                {{this.name}}
+                {{#if this.hasNotes}}<i class="fa-solid fa-user-secret qw-secret-flag"
+                                        data-tooltip="{{localize 'QW.IO.HasNotes'}}"></i>{{/if}}
+              </td>
+              <td><span class="qw-io-badge">{{localize (concat "QW.IO.Action." this.action)}}</span></td>
+              <td class="qw-award-num">
+                {{this.milestones}}{{#if this.hiddenMilestones}}
+                <span class="qw-vault-tag">+{{this.hiddenMilestones}}</span>{{/if}}
+              </td>
+              <td class="qw-award-num">{{this.rewards}}</td>
+              <td class="qw-award-num">{{this.links}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+        <div class="qw-io-options">
+          <label>
+            <input type="checkbox" data-toggle="updateExisting" {{checked updateExisting}}>
+            <span>{{localize "QW.IO.UpdateExisting"}}</span>
+          </label>
+          <label>
+            <input type="checkbox" data-toggle="startHidden" {{checked startHidden}}>
+            <span>{{localize "QW.IO.StartHidden"}}</span>
+          </label>
+        </div>
+
+        <div class="qw-io-actions qw-io-confirm">
+          <button type="button" class="qw-add-btn qw-accept" data-action="runImport"
+                  {{disabled (not canImport)}}>
+            <i class="fa-solid fa-file-import"></i> {{localize "QW.IO.Import"}}
+          </button>
+        </div>
+      </fieldset>
+      {{/if}}
+    {{/if}}
+  </section>
+
+  {{!-- ---------------- Export ---------------- --}}
+  <section class="tab qw-io-tab {{#if tabs.export.active}}active{{/if}}"
+           data-group="primary" data-tab="export">
+
+    <p class="hint">{{localize "QW.IO.ExportHint"}}</p>
+
+    <fieldset>
+      <legend>{{localize "QW.IO.ExportOptions"}}</legend>
+      <label>
+        <input type="checkbox" data-toggle="playerSafe" {{checked playerSafe}}>
+        <span>{{localize "QW.IO.PlayerSafe"}}</span>
+      </label>
+      <p class="hint">{{localize "QW.IO.PlayerSafeHint"}}</p>
+    </fieldset>
+
+    <div class="qw-io-actions">
+      <button type="button" class="qw-add-btn qw-accept" data-action="exportAll">
+        <i class="fa-solid fa-file-export"></i>
+        {{localize "QW.IO.ExportAll"}} ({{exportCount}})
+      </button>
+    </div>
+
+    <p class="hint">{{localize "QW.IO.ExportSingleHint"}}</p>
+  </section>
+
+</div>

@@ -1,0 +1,68 @@
+<article class="qw-card {{#if this.isHidden}}is-hidden-quest{{/if}}" data-quest-uuid="{{this.uuid}}">
+
+  {{#if this.banner}}
+  <div class="qw-card-banner" style="background-image:url('{{this.banner}}')"></div>
+  {{/if}}
+
+  <header class="qw-card-head" data-action="openQuest">
+    {{#if this.img}}<img class="qw-card-img" src="{{this.img}}" alt="{{this.name}}">{{/if}}
+    <div class="qw-card-titles">
+      <h3>{{this.name}}</h3>
+      {{#if this.giver.name}}
+      <span class="qw-card-giver">
+        <i class="fa-solid fa-user"></i> {{this.giver.name}}
+      </span>
+      {{/if}}
+    </div>
+    {{#if @root.isGM}}
+    <button type="button" class="qw-icon-btn qw-card-eye" data-action="toggleVisibility"
+            data-tooltip="{{#if this.isHidden}}{{localize 'QW.Log.ShowToPlayers'}}{{else}}{{localize 'QW.Log.HideFromPlayers'}}{{/if}}">
+      <i class="fa-solid {{#if this.isHidden}}fa-eye-slash{{else}}fa-eye{{/if}}"></i>
+    </button>
+    {{/if}}
+  </header>
+
+  {{#if @root.isGM}}
+  {{#if this.isHidden}}
+  <button type="button" class="qw-card-warning" data-action="toggleVisibility">
+    <i class="fa-solid fa-eye-slash"></i> {{localize "QW.Log.PostedButHidden"}}
+  </button>
+  {{/if}}
+  {{/if}}
+
+  {{#if this.summary}}
+  <div class="qw-card-summary">{{{this.summary}}}</div>
+  {{/if}}
+
+  <div class="qw-chips">
+    {{#if this.difficulty}}<span class="qw-chip">{{this.difficulty}}</span>{{/if}}
+    {{#if this.location}}<span class="qw-chip"><i class="fa-solid fa-location-dot"></i> {{this.location}}</span>{{/if}}
+    {{#if this.deadline}}<span class="qw-chip"><i class="fa-solid fa-hourglass-half"></i> {{this.deadline}}</span>{{/if}}
+    {{#each this.tags}}<span class="qw-chip qw-chip-tag">{{this}}</span>{{/each}}
+  </div>
+
+  {{#if this.hasRewards}}
+  <div class="qw-card-rewards">
+    {{#each this.coins}}<span class="qw-coin qw-coin-{{this.key}}">{{this.value}} {{this.key}}</span>{{/each}}
+    {{#if this.xp}}<span class="qw-coin qw-coin-xp">{{this.xp}} XP</span>{{/if}}
+    {{#each this.items}}
+    <span class="qw-reward-pill">
+      {{#if this.img}}<img src="{{this.img}}" alt="">{{/if}}{{this.name}}{{#if (gt this.qty 1)}} ×{{this.qty}}{{/if}}
+    </span>
+    {{/each}}
+    {{#each this.custom}}<span class="qw-reward-pill"><i class="fa-solid fa-gift"></i> {{this}}</span>{{/each}}
+  </div>
+  {{/if}}
+
+  <footer class="qw-card-foot">
+    <button type="button" class="qw-add-btn" data-action="openQuest">
+      <i class="fa-solid fa-book-open"></i> {{localize "QW.Log.Details"}}
+    </button>
+    {{#if (or @root.isGM @root.canAccept)}}
+    <button type="button" class="qw-add-btn qw-accept" data-action="acceptQuest">
+      <i class="fa-solid fa-hand-fist"></i> {{localize "QW.Log.Accept"}}
+    </button>
+    {{/if}}
+  </footer>
+
+</article>

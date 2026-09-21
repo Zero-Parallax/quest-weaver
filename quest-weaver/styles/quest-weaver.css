@@ -1,0 +1,1725 @@
+/*
+ * Quest Weaver
+ *
+ * Colours build on Foundry's own theme variables (--color-text-primary and
+ * friends) so light and dark both work without a second stylesheet. Fallbacks
+ * keep things legible if a system overrides the palette.
+ */
+
+.quest-weaver {
+  --qw-text: var(--color-text-primary, #1f1f22);
+  --qw-muted: var(--color-text-subtle, #6b6b73);
+  --qw-border: var(--color-fieldset-border, rgba(0, 0, 0, 0.25));
+  --qw-surface: rgba(127, 127, 140, 0.08);
+  --qw-surface-strong: rgba(127, 127, 140, 0.16);
+  --qw-accent: #7a5ea8;
+  --qw-secret: #b8863b;
+  --qw-radius: 6px;
+}
+
+/* ---------- Quest view ---------- */
+
+.quest-weaver .qw-quest-view {
+  color: var(--qw-text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.quest-weaver .qw-banner {
+  height: 120px;
+  border-radius: var(--qw-radius);
+  background-size: cover;
+  background-position: center;
+}
+
+.quest-weaver .qw-quest-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.quest-weaver .qw-quest-img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  flex: 0 0 auto;
+}
+
+.quest-weaver .qw-quest-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quest-weaver .qw-quest-titles h1 {
+  margin: 0 0 0.3rem;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+
+.quest-weaver .qw-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.quest-weaver .qw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--qw-border);
+  border-radius: 999px;
+  background: var(--qw-surface);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.quest-weaver .qw-chip.qw-status {
+  border-color: var(--qw-chip, var(--qw-border));
+  color: var(--qw-chip, inherit);
+  font-weight: 600;
+}
+
+.quest-weaver .qw-giver {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  max-width: 10rem;
+  font-size: 0.85rem;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-giver img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+}
+
+/* ---------- Progress ---------- */
+
+.quest-weaver .qw-progress {
+  position: relative;
+  height: 1.1rem;
+  border: 1px solid var(--qw-border);
+  border-radius: 999px;
+  background: var(--qw-surface);
+  overflow: hidden;
+}
+
+.quest-weaver .qw-progress-bar {
+  height: 100%;
+  background: var(--qw-accent);
+  transition: width 200ms ease;
+}
+
+.quest-weaver .qw-progress-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+
+/* ---------- Sections ---------- */
+
+.quest-weaver .qw-section h2 {
+  margin: 0 0 0.35rem;
+  border-bottom: 1px solid var(--qw-border);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-summary {
+  font-style: italic;
+  color: var(--qw-muted);
+}
+
+/* ---------- Milestones ---------- */
+
+.quest-weaver .qw-milestone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.quest-weaver .qw-milestone {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: var(--qw-radius);
+}
+
+.quest-weaver .qw-milestone:hover {
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-milestone.is-done .qw-milestone-text {
+  text-decoration: line-through;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-milestone-text {
+  flex: 1 1 auto;
+}
+
+.quest-weaver .qw-counter {
+  font-size: 0.75rem;
+  color: var(--qw-muted);
+}
+
+/* Anything still in the vault is tinted, so the GM can see at a glance what
+   the players are not getting. */
+.quest-weaver .is-secret,
+.quest-weaver .qw-milestone.is-secret {
+  background: color-mix(in srgb, var(--qw-secret) 12%, transparent);
+  border-left: 2px solid var(--qw-secret);
+}
+
+.quest-weaver .qw-secret-flag {
+  color: var(--qw-secret);
+  font-size: 0.75rem;
+}
+
+/* ---------- Rewards ---------- */
+
+.quest-weaver .qw-reward-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.35rem;
+  border-radius: var(--qw-radius);
+}
+
+.quest-weaver .qw-reward-row:nth-child(odd) {
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-reward-label {
+  min-width: 5.5rem;
+  color: var(--qw-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.quest-weaver .qw-reward-item img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+  border-radius: 4px;
+}
+
+.quest-weaver .qw-coins {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.quest-weaver .qw-coin {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--qw-surface-strong);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+}
+
+.quest-weaver .qw-coin-pp { box-shadow: inset 0 0 0 1px #9fb8c8; }
+.quest-weaver .qw-coin-gp { box-shadow: inset 0 0 0 1px #d4af37; }
+.quest-weaver .qw-coin-ep { box-shadow: inset 0 0 0 1px #9aa17b; }
+.quest-weaver .qw-coin-sp { box-shadow: inset 0 0 0 1px #b8b8c0; }
+.quest-weaver .qw-coin-cp { box-shadow: inset 0 0 0 1px #b06f43; }
+
+.quest-weaver .qw-qty {
+  color: var(--qw-muted);
+  font-size: 0.8rem;
+}
+
+.quest-weaver .qw-awarded {
+  color: #3dba5a;
+  font-size: 0.8rem;
+}
+
+/* ---------- GM notes ---------- */
+
+.quest-weaver .qw-gm-notes {
+  border: 1px dashed var(--qw-secret);
+  border-radius: var(--qw-radius);
+  padding: 0.5rem 0.6rem;
+  background: color-mix(in srgb, var(--qw-secret) 8%, transparent);
+}
+
+.quest-weaver .qw-gm-notes h2 {
+  border-bottom-color: color-mix(in srgb, var(--qw-secret) 40%, transparent);
+  color: var(--qw-secret);
+}
+
+/* ---------- Edit form ---------- */
+
+.quest-weaver .qw-edit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quest-weaver .qw-vault-fieldset {
+  border-color: var(--qw-secret);
+}
+
+.quest-weaver .qw-vault-fieldset > legend {
+  color: var(--qw-secret);
+}
+
+/* ---------- Sidebar suppression ---------- */
+
+#journal .qw-hidden-entry,
+.journal-sidebar .qw-hidden-entry {
+  display: none;
+}
+
+/* ---------- Editor: shared controls ---------- */
+
+.quest-weaver .qw-subhead {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.4rem 0 0.25rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-subhead > span:first-child {
+  flex: 1 1 auto;
+}
+
+.quest-weaver .qw-icon-btn {
+  flex: 0 0 auto;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--qw-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.quest-weaver .qw-icon-btn:hover {
+  border-color: var(--qw-border);
+  background: var(--qw-surface-strong);
+  color: var(--qw-text);
+}
+
+.quest-weaver .qw-icon-btn.qw-danger:hover {
+  color: #e84040;
+  border-color: #e84040;
+}
+
+.quest-weaver .qw-icon-btn .fa-lock {
+  color: var(--qw-secret);
+}
+
+.quest-weaver .qw-add-btn {
+  width: auto;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  background: var(--qw-surface);
+  cursor: pointer;
+}
+
+.quest-weaver legend .qw-add-btn {
+  margin-left: 0.5rem;
+}
+
+.quest-weaver .qw-vault-tag {
+  flex: 0 0 auto;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--qw-secret) 20%, transparent);
+  color: var(--qw-secret);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.quest-weaver .is-vault {
+  color: var(--qw-secret);
+}
+
+/* ---------- Editor: milestones ---------- */
+
+.quest-weaver .qw-track {
+  padding: 0.25rem 0.4rem 0.4rem;
+  border-radius: var(--qw-radius);
+}
+
+.quest-weaver .qw-track.is-secret {
+  background: color-mix(in srgb, var(--qw-secret) 8%, transparent);
+  border-left: 2px solid var(--qw-secret);
+}
+
+.quest-weaver .qw-track-name {
+  color: var(--qw-text);
+  font-weight: 600;
+}
+
+.quest-weaver .qw-ms-list,
+.quest-weaver .qw-rw-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.quest-weaver .qw-ms-row,
+.quest-weaver .qw-rw-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.25rem;
+  border-radius: 4px;
+}
+
+.quest-weaver .qw-ms-row:hover,
+.quest-weaver .qw-rw-row:hover {
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-ms-text,
+.quest-weaver .qw-rw-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quest-weaver .qw-ms-counter {
+  flex: 0 0 3.2rem;
+  width: 3.2rem;
+  text-align: center;
+}
+
+.quest-weaver .qw-ms-done {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.quest-weaver .qw-ms-done.is-disabled {
+  color: var(--qw-muted);
+  opacity: 0.5;
+}
+
+/* ---------- Editor: rewards ---------- */
+
+.quest-weaver .qw-rw-img {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+  border-radius: 4px;
+}
+
+.quest-weaver .qw-rw-icon {
+  flex: 0 0 auto;
+  width: 24px;
+  text-align: center;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-rw-name {
+  flex: 1 1 auto;
+}
+
+.quest-weaver .qw-rw-qty {
+  flex: 0 0 3.5rem;
+  width: 3.5rem;
+  text-align: center;
+}
+
+.quest-weaver .qw-rw-qty-static {
+  color: var(--qw-muted);
+  font-size: 0.8rem;
+}
+
+.quest-weaver .qw-coin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.quest-weaver .qw-coin-field {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.15rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  background: var(--qw-surface);
+  font-size: 0.75rem;
+}
+
+.quest-weaver .qw-coin-field > span {
+  color: var(--qw-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quest-weaver .qw-coin-field input {
+  text-align: right;
+}
+
+.quest-weaver .qw-secret-input {
+  border-color: color-mix(in srgb, var(--qw-secret) 55%, transparent);
+  color: var(--qw-secret);
+}
+
+.quest-weaver .qw-coin-legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-secret-legend {
+  color: var(--qw-secret);
+}
+
+.quest-weaver .qw-xp-row {
+  display: flex;
+  align-items: end;
+  gap: 0.4rem;
+}
+
+.quest-weaver .qw-xp-row > .form-group {
+  flex: 1 1 auto;
+}
+
+/* ---------- Editor: people ---------- */
+
+.quest-weaver .qw-giver-edit,
+.quest-weaver .qw-assignees {
+  padding: 0.3rem 0.5rem 0.5rem;
+  border: 1px dashed var(--qw-border);
+  border-radius: var(--qw-radius);
+  margin-bottom: 0.5rem;
+}
+
+.quest-weaver .qw-assignee-list {
+  list-style: none;
+  margin: 0 0 0.3rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.quest-weaver .qw-assignee {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.3rem 0.1rem 0.1rem;
+  border: 1px solid var(--qw-border);
+  border-radius: 999px;
+  background: var(--qw-surface);
+  font-size: 0.8rem;
+}
+
+.quest-weaver .qw-assignee img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+/* Drop targets light up while a document is dragged over them. */
+.quest-weaver [data-drop].qw-dragover {
+  border-color: var(--qw-accent);
+  background: color-mix(in srgb, var(--qw-accent) 10%, transparent);
+}
+
+/* ============================================================
+   Quest Log window
+   ============================================================ */
+
+.quest-weaver.qw-log .qw-log-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 0;
+}
+
+/* ---------- Toolbar ---------- */
+
+.quest-weaver .qw-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quest-weaver .qw-search-box {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-search-box > i {
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-search-box input {
+  flex: 1 1 auto;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.quest-weaver .qw-tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.quest-weaver .qw-tag {
+  width: auto;
+  padding: 0 0.5rem;
+  border: 1px solid var(--qw-border);
+  border-radius: 999px;
+  background: var(--qw-surface);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.quest-weaver .qw-tag.is-active {
+  border-color: var(--qw-accent);
+  background: color-mix(in srgb, var(--qw-accent) 20%, transparent);
+}
+
+/* ---------- Tab body ---------- */
+
+.quest-weaver .qw-tab-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.quest-weaver .qw-tab-body:not(.active) {
+  display: none;
+}
+
+.quest-weaver .qw-empty {
+  margin: 2rem 0;
+  text-align: center;
+  color: var(--qw-muted);
+  font-style: italic;
+}
+
+.quest-weaver .qw-empty i {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 1.6rem;
+  opacity: 0.5;
+}
+
+/* ---------- Job board cards ---------- */
+
+.quest-weaver .qw-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 0.6rem;
+}
+
+.quest-weaver .qw-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-card-banner {
+  height: 68px;
+  margin: -0.5rem -0.5rem 0;
+  border-radius: var(--qw-radius) var(--qw-radius) 0 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.quest-weaver .qw-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.quest-weaver .qw-card-img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+  border-radius: 4px;
+}
+
+.quest-weaver .qw-card-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quest-weaver .qw-card-titles h3 {
+  margin: 0;
+  border: none;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.quest-weaver .qw-card-giver {
+  font-size: 0.75rem;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-card-summary {
+  font-size: 0.85rem;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-card-summary p {
+  margin: 0;
+}
+
+.quest-weaver .qw-card-rewards,
+.quest-weaver .qw-row-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.quest-weaver .qw-card-foot {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
+}
+
+.quest-weaver .qw-card-foot .qw-add-btn {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.quest-weaver .qw-accept {
+  border-color: var(--qw-accent);
+  background: color-mix(in srgb, var(--qw-accent) 22%, transparent);
+}
+
+.quest-weaver .qw-reward-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--qw-border);
+  border-radius: 999px;
+  font-size: 0.72rem;
+}
+
+.quest-weaver .qw-reward-pill img {
+  width: 14px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.quest-weaver .qw-coin-xp {
+  box-shadow: inset 0 0 0 1px var(--qw-accent);
+}
+
+.quest-weaver .qw-chip-tag {
+  font-size: 0.68rem;
+  opacity: 0.85;
+}
+
+/* ---------- Quest rows ---------- */
+
+.quest-weaver .qw-quest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.quest-weaver .qw-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-row.is-mine {
+  border-left: 3px solid var(--qw-accent);
+}
+
+/* A quest no player can see reads as a draft, not as live content. */
+.quest-weaver .is-hidden-quest {
+  opacity: 0.72;
+  border-style: dashed;
+}
+
+.quest-weaver .qw-row-status {
+  flex: 0 0 auto;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--qw-chip) 22%, transparent);
+  color: var(--qw-chip);
+}
+
+.quest-weaver .qw-row-img {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.quest-weaver .qw-row-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quest-weaver .qw-row-title {
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.quest-weaver .qw-row-name {
+  font-weight: 600;
+}
+
+.quest-weaver .qw-row-giver {
+  font-size: 0.8rem;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-hidden-flag {
+  color: var(--qw-secret);
+  font-size: 0.75rem;
+}
+
+.quest-weaver .qw-progress-slim {
+  height: 0.55rem;
+}
+
+.quest-weaver .qw-progress-slim .qw-progress-label {
+  font-size: 0.55rem;
+}
+
+.quest-weaver .qw-row-milestones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.quest-weaver .qw-row-ms {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.quest-weaver .qw-row-ms.is-done span {
+  text-decoration: line-through;
+  color: var(--qw-muted);
+}
+
+.quest-weaver .qw-row-ms input[type="checkbox"] {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.quest-weaver .qw-row-side {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.quest-weaver .qw-row-party {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.quest-weaver .qw-row-party img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--qw-border);
+}
+
+.quest-weaver .qw-row-actions {
+  display: flex;
+  gap: 0.15rem;
+}
+
+/* ---------- Journal sidebar button ---------- */
+
+.qw-open-log {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* ---------- Chat cards ---------- */
+
+.quest-weaver.qw-chat .qw-chat-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--qw-chip, inherit);
+  font-size: 0.85rem;
+}
+
+/* Each ApplicationV2 part renders one root element, so the toolbar and the tab
+   sections each sit in a wrapper. These keep the wrappers out of the layout. */
+.quest-weaver .qw-toolbar-part {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+}
+
+.quest-weaver .qw-tab-bodies {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ============================================================
+   Award dialog
+   ============================================================ */
+
+.quest-weaver .qw-award-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.quest-weaver .qw-award-head h2 {
+  margin: 0;
+  border: none;
+  font-size: 1.15rem;
+}
+
+.quest-weaver .qw-award-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--qw-secret);
+  border-radius: var(--qw-radius);
+  background: color-mix(in srgb, var(--qw-secret) 12%, transparent);
+  color: var(--qw-secret);
+  font-size: 0.8rem;
+}
+
+.quest-weaver .qw-award-recipients,
+.quest-weaver .qw-award-items,
+.quest-weaver .qw-award-custom {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.quest-weaver .qw-award-recipients li,
+.quest-weaver .qw-award-items li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+}
+
+.quest-weaver .qw-award-recipients li:hover,
+.quest-weaver .qw-award-items li:hover {
+  background: var(--qw-surface);
+}
+
+.quest-weaver .qw-award-recipients img,
+.quest-weaver .qw-award-items img,
+.quest-weaver .qw-award-who img {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid var(--qw-border);
+}
+
+.quest-weaver .qw-award-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quest-weaver .qw-award-add {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.quest-weaver .qw-award-add select {
+  flex: 1 1 auto;
+}
+
+.quest-weaver .qw-award-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.quest-weaver .qw-award-controls label,
+.quest-weaver .qw-award-body fieldset > label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.quest-weaver .qw-award-controls label > span,
+.quest-weaver .qw-award-body fieldset > label > span {
+  color: var(--qw-muted);
+  white-space: nowrap;
+}
+
+/* ---------- Preview table ---------- */
+
+.quest-weaver .qw-award-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.quest-weaver .qw-award-table th {
+  text-align: left;
+  padding: 0.2rem 0.35rem;
+  border-bottom: 1px solid var(--qw-border);
+  color: var(--qw-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quest-weaver .qw-award-table td {
+  padding: 0.25rem 0.35rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--qw-border) 50%, transparent);
+  vertical-align: middle;
+}
+
+.quest-weaver .qw-award-who {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.quest-weaver .qw-award-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.quest-weaver .qw-award-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.quest-weaver .qw-award-foot .qw-add-btn {
+  padding: 0.3rem 1rem;
+}
+
+/* ---------- Award chat card ---------- */
+
+.quest-weaver.qw-award-card h4 {
+  margin: 0 0 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.quest-weaver .qw-award-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.quest-weaver .qw-award-list li {
+  padding: 0.1rem 0;
+}
+
+.quest-weaver .qw-award-manual {
+  margin: 0.35rem 0 0;
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--qw-border);
+  color: var(--qw-secret);
+  font-size: 0.78rem;
+}
+
+/* ============================================================
+   Import / export
+   ============================================================ */
+
+.quest-weaver .qw-io-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-height: 0;
+}
+
+.quest-weaver .qw-io-tab:not(.active) {
+  display: none;
+}
+
+.quest-weaver .qw-io-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quest-weaver .qw-io-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.quest-weaver .qw-io-confirm {
+  justify-content: flex-end;
+  margin-top: 0.4rem;
+}
+
+.quest-weaver .qw-io-json {
+  width: 100%;
+  min-height: 9rem;
+  font-family: var(--font-monospace, monospace);
+  font-size: 0.78rem;
+  resize: vertical;
+}
+
+.quest-weaver .qw-io-error,
+.quest-weaver .qw-io-warning {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--qw-radius);
+  font-size: 0.8rem;
+}
+
+.quest-weaver .qw-io-error {
+  border: 1px solid #e84040;
+  background: color-mix(in srgb, #e84040 12%, transparent);
+  color: #e84040;
+}
+
+.quest-weaver .qw-io-warning {
+  border: 1px solid var(--qw-secret);
+  background: color-mix(in srgb, var(--qw-secret) 10%, transparent);
+  color: var(--qw-secret);
+}
+
+.quest-weaver .qw-io-counts {
+  margin-left: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--qw-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.quest-weaver .qw-io-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.quest-weaver .qw-io-table th {
+  text-align: left;
+  padding: 0.2rem 0.35rem;
+  border-bottom: 1px solid var(--qw-border);
+  color: var(--qw-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quest-weaver .qw-io-table td {
+  padding: 0.25rem 0.35rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--qw-border) 50%, transparent);
+}
+
+.quest-weaver .qw-io-badge {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--qw-border);
+  font-size: 0.7rem;
+}
+
+/* A row that will overwrite an existing quest is worth noticing. */
+.quest-weaver .qw-io-row.is-update .qw-io-badge {
+  border-color: var(--qw-secret);
+  color: var(--qw-secret);
+}
+
+.quest-weaver .qw-io-row.is-create .qw-io-badge {
+  border-color: #3dba5a;
+  color: #3dba5a;
+}
+
+.quest-weaver .qw-io-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.quest-weaver .qw-io-options label,
+.quest-weaver .qw-io-tab fieldset > label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ============================================================
+   Scrolling and editor sizing
+
+   The `scrollable` part option only restores scroll position across a
+   re-render; it does not create an overflow container. Each window has to
+   define its own, and its children must be stopped from shrinking, because a flex
+   column will squash a ProseMirror editor to nothing, which looks exactly
+   like typing into a box that shows no text.
+   ============================================================ */
+
+.quest-weaver.quest-page .window-content,
+.quest-weaver.quest-page .window-content > form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.quest-weaver.quest-page .journal-header,
+.quest-weaver.quest-page .journal-footer {
+  flex: 0 0 auto;
+}
+
+.quest-weaver.quest-page .qw-edit-body,
+.quest-weaver.quest-page .qw-quest-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.4rem;
+}
+
+/* Children keep their natural height and are not compressed to fit. */
+.quest-weaver .qw-edit-body > fieldset,
+.quest-weaver .qw-quest-view > * {
+  flex: 0 0 auto;
+}
+
+.quest-weaver.qw-io .window-content,
+.quest-weaver.qw-award .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.quest-weaver .qw-io-body,
+.quest-weaver .qw-award-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.4rem;
+}
+
+/* The award window sizes to its content, so cap it so it cannot run
+   off the bottom of the screen. */
+.quest-weaver.qw-award .window-content {
+  max-height: 80vh;
+}
+
+/* ---------- Editors ---------- */
+
+.quest-weaver prose-mirror.editor {
+  display: flex;
+  flex-direction: column;
+  min-height: 9rem;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+}
+
+.quest-weaver prose-mirror.editor .editor-content {
+  flex: 1 1 auto;
+  min-height: 7rem;
+  padding: 0.35rem 0.5rem;
+  overflow-y: auto;
+}
+
+/* An open editor also carries a toolbar, so give it room to write in rather
+   than letting the menu eat half the box. */
+.quest-weaver prose-mirror.editor.active {
+  min-height: 15rem;
+}
+
+.quest-weaver prose-mirror.editor.active .menu-container {
+  flex: 0 0 auto;
+}
+
+.quest-weaver prose-mirror.editor.active .editor-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* An inactive toggled editor still needs room, or clicking it is a lottery. */
+.quest-weaver prose-mirror.editor.inactive .editor-content {
+  cursor: text;
+}
+
+.quest-weaver prose-mirror.editor.inactive:hover {
+  border-color: var(--qw-accent);
+}
+
+.quest-weaver .qw-edit-body .form-group.stacked prose-mirror.editor {
+  width: 100%;
+}
+
+/* ---------- Audience controls ---------- */
+
+.quest-weaver .qw-audience-box {
+  padding: 0.35rem 0.5rem 0.45rem;
+  border: 1px dashed var(--qw-border);
+  border-radius: var(--qw-radius);
+  margin: 0.25rem 0 0.5rem;
+}
+
+.quest-weaver .qw-audience-box.is-hidden-quest {
+  border-color: var(--qw-secret);
+  background: color-mix(in srgb, var(--qw-secret) 8%, transparent);
+}
+
+.quest-weaver .qw-audience-all,
+.quest-weaver .qw-audience-players label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.quest-weaver .qw-audience-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.9rem;
+  margin: 0.2rem 0 0 1.1rem;
+}
+
+/* A quest on the board that no player can see is almost always a mistake,
+   so it gets a one-click fix instead of a quiet icon. */
+.quest-weaver .qw-card-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--qw-secret);
+  border-radius: var(--qw-radius);
+  background: color-mix(in srgb, var(--qw-secret) 15%, transparent);
+  color: var(--qw-secret);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.quest-weaver .qw-card-warning:hover {
+  background: color-mix(in srgb, var(--qw-secret) 28%, transparent);
+}
+
+.quest-weaver .qw-card-eye {
+  flex: 0 0 auto;
+}
+
+/* ---------- Player-proposed quests ---------- */
+
+.quest-weaver .qw-proposed {
+  border-color: var(--qw-accent);
+  color: var(--qw-accent);
+}
+
+.quest-weaver .qw-suggested-reward {
+  border-style: dashed;
+  opacity: 0.9;
+}
+
+.quest-weaver .qw-propose {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quest-weaver .qw-propose label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.quest-weaver .qw-propose label > span {
+  font-size: 0.78rem;
+  color: var(--qw-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   Story web
+   ============================================================ */
+
+.quest-weaver.qw-web .qw-web-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.quest-weaver .qw-web-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.35rem;
+  padding: 0.4rem;
+}
+
+.quest-weaver .qw-web-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.quest-weaver .qw-web-picker,
+.quest-weaver .qw-web-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.quest-weaver .qw-web-picker select {
+  min-width: 11rem;
+}
+
+.quest-weaver .qw-web-tools {
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.quest-weaver .qw-web-sep {
+  width: 1px;
+  height: 1.3rem;
+  background: var(--qw-border);
+  margin: 0 0.2rem;
+}
+
+.quest-weaver .qw-icon-btn.is-on {
+  border-color: var(--qw-accent);
+  background: color-mix(in srgb, var(--qw-accent) 22%, transparent);
+  color: var(--qw-text);
+}
+
+.quest-weaver .qw-web-hint {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--qw-muted);
+}
+
+/* ---------- Canvas ---------- */
+
+.quest-weaver .qw-web-canvas-host,
+.quest-weaver .qw-web-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--qw-border);
+  border-radius: var(--qw-radius);
+  background-color: var(--qw-surface);
+  /* A faint grid gives the eye something to judge position and zoom against. */
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--qw-border) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--qw-border) 45%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  cursor: grab;
+  --qw-edge: var(--qw-muted);
+}
+
+.quest-weaver .qw-web-canvas.is-panning {
+  cursor: grabbing;
+}
+
+.quest-weaver .qw-web-viewport {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.quest-weaver .qw-web-edges {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.quest-weaver .qw-web-edge {
+  fill: none;
+  stroke-width: 2.5;
+  pointer-events: stroke;
+  cursor: context-menu;
+}
+
+.quest-weaver .qw-web-edge.is-derived {
+  stroke-width: 3;
+}
+
+.quest-weaver .qw-web-edge.is-ghost {
+  stroke: var(--qw-accent);
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+
+.quest-weaver .qw-web-edge-label {
+  fill: var(--qw-muted);
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: var(--color-bg, #000);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+.quest-weaver .qw-web-nodes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ---------- Node cards ---------- */
+
+.quest-weaver .qw-web-node {
+  position: absolute;
+  width: 180px;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--qw-node, var(--qw-border));
+  border-left: 4px solid var(--qw-node, var(--qw-accent));
+  border-radius: var(--qw-radius);
+  background: var(--color-bg-option, rgba(20, 20, 24, 0.94));
+  color: var(--qw-text);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+}
+
+.quest-weaver .qw-web-node:active {
+  cursor: grabbing;
+}
+
+.quest-weaver .qw-web-node.is-selected {
+  outline: 2px solid var(--qw-accent);
+  outline-offset: 2px;
+}
+
+.quest-weaver .qw-web-node.is-link-target {
+  outline: 2px dashed var(--qw-accent);
+  outline-offset: 2px;
+}
+
+.quest-weaver .qw-web-node.is-hidden-quest {
+  opacity: 0.78;
+  border-style: dashed;
+}
+
+.quest-weaver .qw-web-node-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.quest-weaver .qw-web-node-head i {
+  color: var(--qw-node, var(--qw-muted));
+  flex: 0 0 auto;
+}
+
+.quest-weaver .qw-web-node-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  color: var(--qw-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quest-weaver .qw-web-node-notes {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--qw-muted);
+  line-height: 1.3;
+}
+
+.quest-weaver .qw-web-progress {
+  height: 4px;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+  background: var(--qw-surface-strong);
+  overflow: hidden;
+}
+
+.quest-weaver .qw-web-progress > div {
+  height: 100%;
+  background: var(--qw-node, var(--qw-accent));
+}
+
+/* The link handle sits outside the card so dragging it is unambiguous. */
+.quest-weaver .qw-web-handle {
+  position: absolute;
+  right: -11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--qw-border);
+  border-radius: 50%;
+  background: var(--color-bg-option, #16161a);
+  color: var(--qw-muted);
+  font-size: 0.65rem;
+  cursor: crosshair;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.quest-weaver .qw-web-node:hover .qw-web-handle,
+.quest-weaver .qw-web-node.is-selected .qw-web-handle {
+  opacity: 1;
+}
+
+.quest-weaver .qw-web-handle:hover {
+  border-color: var(--qw-accent);
+  color: var(--qw-accent);
+}
+
+/* ---------- Canvas context menu ---------- */
+
+.qw-web-menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 11rem;
+  padding: 0.2rem;
+  border: 1px solid var(--qw-border, #444);
+  border-radius: 6px;
+  background: var(--color-bg-option, #16161a);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+.qw-web-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.qw-web-menu button:hover {
+  background: rgba(127, 127, 140, 0.22);
+}

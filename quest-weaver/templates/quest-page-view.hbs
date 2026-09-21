@@ -1,0 +1,115 @@
+<article class="qw-quest-view" data-quest-uuid="{{uuid}}">
+
+  {{#if system.banner}}
+  <div class="qw-banner" style="background-image:url('{{system.banner}}')"></div>
+  {{/if}}
+
+  <header class="qw-quest-head">
+    {{#if system.img}}<img class="qw-quest-img" src="{{system.img}}" alt="{{name}}">{{/if}}
+    <div class="qw-quest-titles">
+      <h1>{{name}}</h1>
+      <div class="qw-chips">
+        <span class="qw-chip qw-status" style="--qw-chip:{{statusMeta.color}}">
+          <i class="fa-solid {{statusMeta.icon}}"></i>
+          {{localize (concat "QW.Status." system.status)}}
+        </span>
+        {{#if system.difficulty}}<span class="qw-chip">{{system.difficulty}}</span>{{/if}}
+        {{#if system.location}}<span class="qw-chip"><i class="fa-solid fa-location-dot"></i> {{system.location}}</span>{{/if}}
+        {{#if system.deadline}}<span class="qw-chip"><i class="fa-solid fa-hourglass-half"></i> {{system.deadline}}</span>{{/if}}
+        {{#if isGM}}
+          <span class="qw-chip qw-audience" title="{{localize 'QW.Quest.AudienceHint'}}">
+            <i class="fa-solid {{#if hidden}}fa-eye-slash{{else}}fa-eye{{/if}}"></i>
+            {{#if hidden}}{{localize "QW.Quest.HiddenFromAll"}}{{else}}{{#if audience.length}}{{audience.length}}{{else}}{{localize "QW.Quest.Everyone"}}{{/if}}{{/if}}
+          </span>
+        {{/if}}
+      </div>
+    </div>
+    {{#if system.giver.name}}
+    <div class="qw-giver" title="{{localize 'QW.Quest.Giver'}}">
+      {{#if system.giver.img}}<img src="{{system.giver.img}}" alt="{{system.giver.name}}">{{/if}}
+      <span>{{system.giver.name}}</span>
+    </div>
+    {{/if}}
+  </header>
+
+  {{#if progress.total}}
+  <div class="qw-progress" role="progressbar" aria-valuenow="{{progress.pct}}" aria-valuemin="0" aria-valuemax="100">
+    <div class="qw-progress-bar" style="width:{{progress.pct}}%"></div>
+    <span class="qw-progress-label">{{progress.done}} / {{progress.total}}</span>
+  </div>
+  {{/if}}
+
+  {{#if enriched.summary}}
+  <section class="qw-summary">{{{enriched.summary}}}</section>
+  {{/if}}
+
+  {{#if enriched.description}}
+  <section class="qw-section qw-description">{{{enriched.description}}}</section>
+  {{/if}}
+
+  {{#if milestones.length}}
+  <section class="qw-section qw-milestones">
+    <h2>{{localize "QW.Quest.Milestones"}}</h2>
+    <ul class="qw-milestone-list">
+      {{#each milestones}}
+      <li class="qw-milestone {{#if this.done}}is-done{{/if}} {{#if this.hidden}}is-secret{{/if}}">
+        <i class="fa-solid {{#if this.done}}fa-square-check{{else}}fa-square{{/if}}"></i>
+        <span class="qw-milestone-text">{{this.text}}</span>
+        {{#if this.counter.max}}<span class="qw-counter">{{this.counter.value}}/{{this.counter.max}}</span>{{/if}}
+        {{#if this.hidden}}<i class="fa-solid fa-lock qw-secret-flag" title="{{localize 'QW.Quest.GMOnly'}}"></i>{{/if}}
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+  {{/if}}
+
+  {{#if rewards.any}}
+  <section class="qw-section qw-rewards">
+    <h2>{{localize "QW.Quest.Rewards"}}</h2>
+
+    {{#if rewards.currency.length}}
+    <div class="qw-reward-row">
+      <span class="qw-reward-label">{{localize "QW.Reward.Currency"}}</span>
+      <span class="qw-coins">
+        {{#each rewards.currency}}<span class="qw-coin qw-coin-{{this.key}}">{{this.value}} {{this.key}}</span>{{/each}}
+      </span>
+      {{#if (and isGM (not rewards.currencyRevealed))}}<i class="fa-solid fa-lock qw-secret-flag" title="{{localize 'QW.Quest.NotRevealed'}}"></i>{{/if}}
+    </div>
+    {{/if}}
+
+    {{#if rewards.xp}}
+    <div class="qw-reward-row">
+      <span class="qw-reward-label">{{localize "QW.Reward.XP"}}</span>
+      <span>{{numberFormat rewards.xp.value}}</span>
+      {{#if (and isGM (not rewards.xp.revealed))}}<i class="fa-solid fa-lock qw-secret-flag" title="{{localize 'QW.Quest.NotRevealed'}}"></i>{{/if}}
+    </div>
+    {{/if}}
+
+    {{#each rewards.items}}
+    <div class="qw-reward-row qw-reward-item {{#if this.fromVault}}is-secret{{/if}}">
+      {{#if this.img}}<img src="{{this.img}}" alt="{{this.name}}">{{/if}}
+      <span>{{this.name}}</span>
+      {{#if (gt this.qty 1)}}<span class="qw-qty">×{{this.qty}}</span>{{/if}}
+      {{#if this.awarded}}<i class="fa-solid fa-circle-check qw-awarded" title="{{localize 'QW.Reward.Awarded'}}"></i>{{/if}}
+      {{#if (or this.fromVault (and isGM (not this.revealed)))}}<i class="fa-solid fa-lock qw-secret-flag" title="{{localize 'QW.Quest.NotRevealed'}}"></i>{{/if}}
+    </div>
+    {{/each}}
+
+    {{#each rewards.custom}}
+    <div class="qw-reward-row {{#if this.fromVault}}is-secret{{/if}}">
+      <span class="qw-reward-label"><i class="fa-solid fa-gift"></i></span>
+      <span>{{this.text}}</span>
+      {{#if (or this.fromVault (and isGM (not this.revealed)))}}<i class="fa-solid fa-lock qw-secret-flag" title="{{localize 'QW.Quest.NotRevealed'}}"></i>{{/if}}
+    </div>
+    {{/each}}
+  </section>
+  {{/if}}
+
+  {{#if enriched.gmNotes}}
+  <section class="qw-section qw-gm-notes">
+    <h2><i class="fa-solid fa-user-secret"></i> {{localize "QW.Quest.GMNotes"}}</h2>
+    <div class="qw-gm-notes-body">{{{enriched.gmNotes}}}</div>
+  </section>
+  {{/if}}
+
+</article>

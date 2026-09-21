@@ -1,0 +1,76 @@
+{
+  "questWeaver": 1,
+  "chain": {
+    "id": "shadow-of-the-mire",
+    "name": "Shadow of the Mire",
+    "description": "Three linked jobs out of Mirefoot Harbour."
+  },
+  "quests": [
+    {
+      "id": "mire-1",
+      "name": "The Sunken Bell",
+      "status": "available",
+      "posted": true,
+      "summary": "<p>The harbour bell has not rung for nine days.</p>",
+      "description": "<p>Harbourmaster Vex wants the bell recovered from the silt before the tide festival. He is offering good coin and asking no questions.</p>",
+      "difficulty": "Moderate",
+      "location": "Mirefoot Harbour",
+      "deadline": "Before the tide festival",
+      "tags": ["harbour", "salvage"],
+      "giver": { "name": "Harbourmaster Vex" },
+      "tracks": [
+        { "id": "main", "name": "Main" },
+        { "id": "whispers", "name": "Whispers", "hidden": true }
+      ],
+      "milestones": [
+        { "track": "main", "text": "Find the bell in the silt channel" },
+        { "track": "main", "text": "Raise it without breaking the yoke" },
+        { "track": "whispers", "text": "Notice the rope was cut, not frayed" },
+        { "track": "whispers", "text": "Realise Vex is lying" }
+      ],
+      "rewards": {
+        "currency": { "gp": 50 },
+        "items": [{ "name": "Coil of Tarred Rope", "qty": 2 }],
+        "custom": [{ "text": "A favour from the Smugglers' Guild", "hidden": true }]
+      },
+      "gmNotes": "<p>Vex sank the bell himself to cover a smuggling run. If the party raises it intact they will find the cut rope still knotted to the clapper.</p>",
+      "links": { "unlocks": ["mire-2"] }
+    },
+    {
+      "id": "mire-2",
+      "name": "The Ledger of Ash",
+      "status": "draft",
+      "summary": "<p>Someone is buying up debt in the lower ward.</p>",
+      "description": "<p>Every debt in the lower ward has changed hands in a fortnight, and nobody will say to whom.</p>",
+      "difficulty": "Dangerous",
+      "location": "Lower Ward",
+      "tags": ["city", "intrigue"],
+      "giver": { "name": "Archivist Sella" },
+      "milestones": [
+        { "text": "Find the ledger" },
+        { "text": "Identify the buyer", "hidden": true }
+      ],
+      "rewards": {
+        "currency": { "gp": 120 },
+        "xp": { "value": 250, "hidden": true }
+      },
+      "gmNotes": "<p>The buyer is the party's own patron, using a factor's name.</p>",
+      "links": { "requires": ["mire-1"], "unlocks": ["mire-3"] }
+    },
+    {
+      "id": "mire-3",
+      "name": "Low Tide",
+      "status": "draft",
+      "summary": "<p>Everything the mire swallowed comes back at low tide.</p>",
+      "difficulty": "Deadly",
+      "location": "The Mire",
+      "tags": ["finale"],
+      "milestones": [{ "text": "Reach the wreck before the tide turns" }],
+      "rewards": {
+        "currency": { "gp": 300, "sp": 50 },
+        "custom": [{ "text": "The patron's true name" }]
+      },
+      "links": { "requires": ["mire-2"] }
+    }
+  ]
+}

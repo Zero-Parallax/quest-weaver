@@ -1,0 +1,42 @@
+<div class="qw-toolbar-part">
+  <div class="qw-toolbar">
+    <div class="qw-search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" name="qw-search" value="{{search}}"
+             placeholder="{{localize 'QW.Log.SearchPlaceholder'}}"
+             aria-label="{{localize 'QW.Log.SearchPlaceholder'}}">
+      {{#if (or search tag)}}
+      <button type="button" class="qw-icon-btn" data-action="clearSearch"
+              data-tooltip="{{localize 'QW.Log.ClearFilters'}}">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      {{/if}}
+    </div>
+
+    {{#if canCreate}}
+    <button type="button" class="qw-add-btn" data-action="newQuest">
+      <i class="fa-solid fa-plus"></i>
+      {{#if isGM}}{{localize "QW.Log.NewQuest"}}{{else}}{{localize "QW.Propose.Title"}}{{/if}}
+    </button>
+    {{/if}}
+    {{#if isGM}}
+    <button type="button" class="qw-icon-btn" data-action="openStoryWeb"
+            data-tooltip="{{localize 'QW.Web.Title'}}">
+      <i class="fa-solid fa-diagram-project"></i>
+    </button>
+    <button type="button" class="qw-icon-btn" data-action="openImportExport"
+            data-tooltip="{{localize 'QW.IO.Title'}}">
+      <i class="fa-solid fa-file-import"></i>
+    </button>
+    {{/if}}
+  </div>
+
+  {{#if tags.length}}
+  <div class="qw-tag-filters">
+    {{#each tags}}
+    <button type="button" class="qw-tag {{#if (eq this @root.tag)}}is-active{{/if}}"
+            data-action="filterTag" data-tag="{{this}}">{{this}}</button>
+    {{/each}}
+  </div>
+  {{/if}}
+</div>

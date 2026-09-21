@@ -1,0 +1,70 @@
+﻿{
+    "id":  "quest-weaver",
+    "title":  "Quest Weaver",
+    "description":  "System-agnostic quest log, job board and GM story web for Foundry VTT. Quests are real documents, so secrets stay on the server side of the wire.",
+    "version":  "0.1.0",
+    "compatibility":  {
+                          "minimum":  "14",
+                          "verified":  "14.368"
+                      },
+    "authors":  [
+                    {
+                        "name":  "AJBuc"
+                    }
+                ],
+    "esmodules":  [
+                      "scripts/main.js"
+                  ],
+    "styles":  [
+                   "styles/quest-weaver.css"
+               ],
+    "languages":  [
+                      {
+                          "lang":  "en",
+                          "name":  "English",
+                          "path":  "lang/en.json"
+                      }
+                  ],
+    "documentTypes":  {
+                          "JournalEntryPage":  {
+                                                   "quest":  {
+                                                                 "htmlFields":  [
+                                                                                    "summary",
+                                                                                    "description"
+                                                                                ],
+                                                                 "filePathFields":  {
+                                                                                        "img":  [
+                                                                                                    "IMAGE"
+                                                                                                ],
+                                                                                        "banner":  [
+                                                                                                       "IMAGE"
+                                                                                                   ]
+                                                                                    }
+                                                             },
+                                                   "secrets":  {
+                                                                   "htmlFields":  [
+                                                                                      "gmNotes"
+                                                                                  ],
+                                                                   "filePathFields":  {
+
+                                                                                      }
+                                                               },
+                                                   "storyweb":  {
+                                                                    "htmlFields":  [
+                                                                                       "description"
+                                                                                   ],
+                                                                    "filePathFields":  {
+
+                                                                                       }
+                                                                }
+                                               }
+                      },
+    "socket":  true,
+    "license":  "MIT",
+    "readme":  "README.md",
+    "url":  "https://github.com/Zero-Parallax/quest-weaver",
+    "bugs":  "https://github.com/Zero-Parallax/quest-weaver/issues",
+    "manifest":  "https://github.com/Zero-Parallax/quest-weaver/releases/download/v0.1.0/module.json",
+    "download":  "https://github.com/Zero-Parallax/quest-weaver/releases/download/v0.1.0/quest-weaver.zip",
+    "changelog":  "https://github.com/YOUR-GITHUB-USERNAME/quest-weaver/blob/main/CHANGELOG.md"
+}

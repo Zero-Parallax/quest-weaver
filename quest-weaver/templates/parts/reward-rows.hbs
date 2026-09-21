@@ -1,0 +1,57 @@
+{{!-- One reward row. Public rows are form-bound by index; vault rows are shown
+      read-only and become editable once revealed. --}}
+<li class="qw-rw-row {{#if this.fromVault}}is-secret{{/if}}" data-reward-id="{{this.id}}">
+
+  {{#if (eq this.kind "items")}}
+    {{#if this.img}}<img class="qw-rw-img" src="{{this.img}}" alt="{{this.name}}">{{/if}}
+    {{#unless this.fromVault}}
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.id" value="{{this.id}}">
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.uuid" value="{{this.uuid}}">
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.name" value="{{this.name}}">
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.img" value="{{this.img}}">
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.revealed" value="true">
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.awarded" value="{{this.awarded}}">
+      <input type="hidden" name="system.rewards.items.{{this.idx}}.awardedTo" value="{{this.awardedTo}}">
+      <span class="qw-rw-name">{{this.name}}</span>
+      <input class="qw-rw-qty" type="number" min="1" value="{{this.qty}}"
+             name="system.rewards.items.{{this.idx}}.qty"
+             data-tooltip="{{localize 'QW.Edit.Quantity'}}">
+    {{else}}
+      <span class="qw-rw-name is-vault">{{this.name}}</span>
+      <input class="qw-rw-qty qw-secret-input" type="number" min="1" value="{{this.qty}}"
+             data-vault-qty="{{this.id}}" data-tooltip="{{localize 'QW.Edit.Quantity'}}">
+      <span class="qw-vault-tag">{{localize "QW.Edit.InVault"}}</span>
+    {{/unless}}
+  {{else}}
+    <i class="fa-solid fa-gift qw-rw-icon"></i>
+    {{#unless this.fromVault}}
+      <input type="hidden" name="system.rewards.custom.{{this.idx}}.id" value="{{this.id}}">
+      <input type="hidden" name="system.rewards.custom.{{this.idx}}.revealed" value="true">
+      <input type="hidden" name="system.rewards.custom.{{this.idx}}.awarded" value="{{this.awarded}}">
+      <input class="qw-rw-text" type="text" name="system.rewards.custom.{{this.idx}}.text"
+             value="{{this.text}}" placeholder="{{localize 'QW.Edit.CustomRewardPlaceholder'}}">
+    {{else}}
+      <input class="qw-rw-text qw-secret-input" type="text" value="{{this.text}}"
+             data-vault-text="{{this.id}}"
+             placeholder="{{localize 'QW.Edit.CustomRewardPlaceholder'}}">
+      <span class="qw-vault-tag">{{localize "QW.Edit.InVault"}}</span>
+    {{/unless}}
+  {{/if}}
+
+  {{#if this.awarded}}
+  <i class="fa-solid fa-circle-check qw-awarded" data-tooltip="{{localize 'QW.Reward.Awarded'}}"></i>
+  {{/if}}
+
+  <button type="button" class="qw-icon-btn" data-action="toggleRewardSecret"
+          data-kind="{{this.kind}}" data-reward-id="{{this.id}}"
+          data-secret="{{#if this.fromVault}}true{{else}}false{{/if}}"
+          data-tooltip="{{#if this.fromVault}}{{localize 'QW.Edit.RevealToPlayers'}}{{else}}{{localize 'QW.Edit.MoveToVault'}}{{/if}}">
+    <i class="fa-solid {{#if this.fromVault}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+  </button>
+  <button type="button" class="qw-icon-btn qw-danger" data-action="deleteReward"
+          data-kind="{{this.kind}}" data-reward-id="{{this.id}}"
+          data-secret="{{#if this.fromVault}}true{{else}}false{{/if}}"
+          data-tooltip="{{localize 'QW.Edit.Delete'}}">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</li>

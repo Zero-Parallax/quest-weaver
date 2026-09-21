@@ -1,0 +1,200 @@
+<div class="qw-edit-body">
+
+  <fieldset>
+    <legend>{{localize "QW.Edit.Overview"}}</legend>
+    {{formGroup systemFields.status value=system.status localize=true}}
+    {{formGroup systemFields.posted value=system.posted hint=(localize "QW.Field.PostedHint")}}
+
+    {{#if isGM}}
+    <div class="qw-audience-box {{#if hidden}}is-hidden-quest{{/if}}">
+      <div class="qw-subhead">
+        <span>{{localize "QW.Edit.Audience"}}</span>
+        {{#if hidden}}<span class="qw-vault-tag">{{localize "QW.Quest.HiddenFromAll"}}</span>{{/if}}
+      </div>
+      <label class="qw-audience-all">
+        <input type="checkbox" data-qw-audience="all" {{checked visibleToAll}}>
+        <span>{{localize "QW.Edit.AudienceAll"}}</span>
+      </label>
+      {{#unless visibleToAll}}
+      <div class="qw-audience-players">
+        {{#each players}}
+        <label>
+          <input type="checkbox" data-qw-audience="user" data-user-id="{{this.id}}" {{checked this.checked}}>
+          <span>{{this.name}}</span>
+        </label>
+        {{/each}}
+      </div>
+      {{/unless}}
+      <p class="hint">{{localize "QW.Edit.AudienceHint"}}</p>
+    </div>
+    {{/if}}
+    <div class="form-group">
+      <label for="{{partId}}-difficulty">{{localize "QW.Quest.FIELDS.difficulty.label"}}</label>
+      <div class="form-fields">
+        <input id="{{partId}}-difficulty" type="text" name="system.difficulty"
+               value="{{system.difficulty}}" list="{{partId}}-difficulties"
+               placeholder="{{localize 'QW.Edit.DifficultyPlaceholder'}}">
+        <datalist id="{{partId}}-difficulties">
+          {{#each difficulties}}<option value="{{this}}"></option>{{/each}}
+        </datalist>
+      </div>
+    </div>
+    {{formGroup systemFields.location value=system.location}}
+    {{formGroup systemFields.deadline value=system.deadline}}
+  </fieldset>
+
+  <fieldset>
+    <legend>{{localize "QW.Edit.Presentation"}}</legend>
+    {{formGroup systemFields.img value=system.img}}
+    {{formGroup systemFields.banner value=system.banner}}
+    {{formGroup systemFields.summary value=system.summary enriched=enriched.summary toggled=true}}
+    {{formGroup systemFields.description value=system.description enriched=enriched.description toggled=true}}
+  </fieldset>
+
+  <fieldset>
+    <legend>{{localize "QW.Edit.People"}}</legend>
+
+    <div class="qw-giver-edit" data-drop="giver">
+      <div class="qw-subhead">
+        <span>{{localize "QW.Quest.Giver"}}</span>
+        {{#if system.giver.name}}
+        <button type="button" class="qw-icon-btn qw-danger" data-action="clearGiver"
+                data-tooltip="{{localize 'QW.Edit.ClearGiver'}}">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        {{/if}}
+      </div>
+      {{formGroup systemFields.giver.fields.name value=system.giver.name}}
+      {{formGroup systemFields.giver.fields.img value=system.giver.img}}
+      <input type="hidden" name="system.giver.uuid" value="{{system.giver.uuid}}">
+      <p class="hint">{{localize "QW.Field.GiverDropHint"}}</p>
+    </div>
+
+    <div class="qw-assignees" data-drop="assignees">
+      <div class="qw-subhead"><span>{{localize "QW.Edit.Assigned"}}</span></div>
+      {{#if assignees.length}}
+      <ul class="qw-assignee-list">
+        {{#each assignees}}
+        <li class="qw-assignee">
+          <img src="{{this.img}}" alt="{{this.name}}" data-action="openAssignee" data-uuid="{{this.uuid}}">
+          <span>{{this.name}}</span>
+          <button type="button" class="qw-icon-btn qw-danger" data-action="removeAssignee"
+                  data-uuid="{{this.uuid}}" data-tooltip="{{localize 'QW.Edit.Unassign'}}">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </li>
+        {{/each}}
+      </ul>
+      {{/if}}
+      <p class="hint">{{localize "QW.Field.AssignDropHint"}}</p>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>
+      {{localize "QW.Quest.Milestones"}}
+      <button type="button" class="qw-add-btn" data-action="addTrack">
+        <i class="fa-solid fa-plus"></i> {{localize "QW.Edit.AddTrack"}}
+      </button>
+    </legend>
+
+    {{#each groups}}
+    <section class="qw-track {{#if this.secret}}is-secret{{/if}}">
+      <div class="qw-subhead">
+        {{#if this.track}}
+          <span class="qw-track-name">{{#if this.track.name}}{{this.track.name}}{{else}}{{localize "QW.Edit.UnnamedTrack"}}{{/if}}</span>
+          {{#if this.secret}}<span class="qw-vault-tag">{{localize "QW.Edit.TrackInVault"}}</span>{{/if}}
+          <button type="button" class="qw-icon-btn" data-action="toggleTrackSecret"
+                  data-track-id="{{this.track.id}}" data-secret="{{#if this.secret}}true{{else}}false{{/if}}"
+                  data-tooltip="{{#if this.secret}}{{localize 'QW.Edit.RevealTrack'}}{{else}}{{localize 'QW.Edit.HideTrack'}}{{/if}}">
+            <i class="fa-solid {{#if this.secret}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+          </button>
+          <button type="button" class="qw-icon-btn" data-action="addMilestone" data-track-id="{{this.track.id}}"
+                  data-tooltip="{{localize 'QW.Edit.AddMilestone'}}">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <button type="button" class="qw-icon-btn qw-danger" data-action="deleteTrack"
+                  data-track-id="{{this.track.id}}" data-tooltip="{{localize 'QW.Edit.DeleteTrack'}}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        {{else}}
+          <span class="qw-track-name">{{localize "QW.Edit.Untracked"}}</span>
+          <button type="button" class="qw-icon-btn" data-action="addMilestone"
+                  data-tooltip="{{localize 'QW.Edit.AddMilestone'}}">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        {{/if}}
+      </div>
+      <ul class="qw-ms-list">
+        {{#each this.milestones}}{{> "modules/quest-weaver/templates/parts/milestone-row.hbs"}}{{/each}}
+      </ul>
+    </section>
+    {{/each}}
+
+    {{#unless groups.length}}
+    <p class="hint">{{localize "QW.Edit.NoMilestones"}}</p>
+    <button type="button" class="qw-add-btn" data-action="addMilestone">
+      <i class="fa-solid fa-plus"></i> {{localize "QW.Edit.AddMilestone"}}
+    </button>
+    {{/unless}}
+  </fieldset>
+
+  <fieldset data-drop="rewards">
+    <legend>
+      {{localize "QW.Quest.Rewards"}}
+      <button type="button" class="qw-add-btn" data-action="revealAllRewards">
+        <i class="fa-solid fa-lock-open"></i> {{localize "QW.Edit.RevealAll"}}
+      </button>
+      <button type="button" class="qw-add-btn" data-action="awardRewards">
+        <i class="fa-solid fa-sack-dollar"></i> {{localize "QW.Award.Title"}}
+      </button>
+    </legend>
+    <p class="hint">{{localize "QW.Field.RewardDropHint"}}</p>
+
+    <div class="qw-coin-grid">
+      {{#each coins}}
+      <label class="qw-coin-field">
+        <span>{{this.label}}</span>
+        <input type="number" min="0" name="system.rewards.currency.amounts.{{this.key}}"
+               value="{{this.value}}" data-tooltip="{{localize 'QW.Edit.CoinShown'}}">
+        <input type="number" min="0" name="secrets.currency.{{this.key}}"
+               value="{{this.secretValue}}" class="qw-secret-input"
+               data-tooltip="{{localize 'QW.Edit.CoinVault'}}">
+      </label>
+      {{/each}}
+    </div>
+    <div class="qw-coin-legend">
+      <span><i class="fa-solid fa-eye"></i> {{localize "QW.Edit.CoinShown"}}</span>
+      <span class="qw-secret-legend"><i class="fa-solid fa-lock"></i> {{localize "QW.Edit.CoinVault"}}</span>
+    </div>
+
+    <div class="qw-xp-row">
+      {{formGroup systemFields.rewards.fields.xp.fields.value value=system.rewards.xp.value
+                  label=(localize "QW.Reward.XP")}}
+      {{#if rewards.secretXp}}
+      <button type="button" class="qw-icon-btn" data-action="toggleRewardSecret" data-kind="xp"
+              data-secret="true" data-tooltip="{{localize 'QW.Edit.RevealXp'}}">
+        <i class="fa-solid fa-lock"></i>
+      </button>
+      {{/if}}
+    </div>
+
+    <ul class="qw-rw-list">
+      {{#each rewards.items}}{{> "modules/quest-weaver/templates/parts/reward-rows.hbs"}}{{/each}}
+      {{#each rewards.custom}}{{> "modules/quest-weaver/templates/parts/reward-rows.hbs"}}{{/each}}
+    </ul>
+    <button type="button" class="qw-add-btn" data-action="addCustomReward">
+      <i class="fa-solid fa-plus"></i> {{localize "QW.Edit.AddCustomReward"}}
+    </button>
+  </fieldset>
+
+  {{#if isGM}}
+  <fieldset class="qw-vault-fieldset">
+    <legend><i class="fa-solid fa-user-secret"></i> {{localize "QW.Quest.GMNotes"}}</legend>
+    <p class="hint">{{localize "QW.Field.GMNotesHint"}}</p>
+    {{formGroup gmNotesField value=quest.gmNotes enriched=enriched.gmNotes
+                name="secrets.system.gmNotes" toggled=true label=""}}
+  </fieldset>
+  {{/if}}
+
+</div>

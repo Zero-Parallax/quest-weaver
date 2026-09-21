@@ -1,0 +1,11 @@
+# Normalise line endings. The release workflow runs on Linux, and Foundry reads
+# these files directly, so keep everything LF in the repository.
+* text=auto eol=lf
+
+# Windows-only tooling stays CRLF so it opens sanely in a Windows editor.
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.zip binary

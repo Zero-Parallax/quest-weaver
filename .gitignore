@@ -1,0 +1,9 @@
+# Build output
+dist/
+
+# Editor and OS noise
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+*.swp

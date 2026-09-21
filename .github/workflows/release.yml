@@ -1,0 +1,85 @@
+# Build and publish a Quest Weaver release.
+#
+# Push a tag and this does the rest:
+#     git tag v0.2.0 && git push origin v0.2.0
+#
+# It stamps the version into module.json, zips the module folder's contents
+# (Foundry expects module.json at the archive root), and attaches both the zip
+# and a "latest"-pointing manifest to a GitHub release.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive version from the tag
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Stamp version and release URLs into the manifest
+        working-directory: quest-weaver
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os
+          version = os.environ["VERSION"]
+          url = os.environ["REPO_URL"]
+          with open("module.json", encoding="utf-8") as f:
+              manifest = json.load(f)
+          manifest["version"] = version
+          manifest["url"] = url
+          manifest["bugs"] = f"{url}/issues"
+          manifest["changelog"] = f"{url}/blob/main/CHANGELOG.md"
+          # Pinned inside the zip; the published copy tracks latest.
+          manifest["manifest"] = f"{url}/releases/download/v{version}/module.json"
+          manifest["download"] = f"{url}/releases/download/v{version}/quest-weaver.zip"
+          with open("module.json", "w", encoding="utf-8") as f:
+              json.dump(manifest, f, indent=2, ensure_ascii=False)
+              f.write("\n")
+          PY
+
+      - name: Build the package
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          cd quest-weaver && zip -r ../quest-weaver.zip . -x '*.git*' && cd ..
+          python - <<'PY'
+          import json, os
+          version = os.environ["VERSION"]
+          url = os.environ["REPO_URL"]
+          with open("quest-weaver/module.json", encoding="utf-8") as f:
+              manifest = json.load(f)
+          manifest["manifest"] = f"{url}/releases/latest/download/module.json"
+          manifest["download"] = f"{url}/releases/download/v{version}/quest-weaver.zip"
+          with open("module.json", "w", encoding="utf-8") as f:
+              json.dump(manifest, f, indent=2, ensure_ascii=False)
+              f.write("\n")
+          PY
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Quest Weaver ${{ steps.version.outputs.value }}
+          body: |
+            Install in Foundry with this manifest URL:
+
+            `${{ github.server_url }}/${{ github.repository }}/releases/latest/download/module.json`
+
+            See [CHANGELOG.md](${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGELOG.md).
+          files: |
+            quest-weaver.zip
+            module.json
