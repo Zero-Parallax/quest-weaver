@@ -1,11 +1,11 @@
 # Quest Weaver import format
 
-A single JSON file describes a quest or a whole chain. It is meant to be written by hand or
+A single JSON file describes a quest, a whole chain, or story webs to go with them. It is meant to be written by hand or
 drafted by an AI and pasted straight into **Quest Log → Import / Export**, so almost everything
 is optional and the importer is forgiving about shape.
 
-Nothing is created until you press Import: the dialog previews every quest first, says whether it
-will be created or updated, and lists anything it could not understand.
+Nothing is created until you press Import: the dialog previews every quest and web first, says
+whether it will be created or updated, and lists anything it could not understand.
 
 ## Minimum viable file
 
@@ -21,7 +21,8 @@ A bare array of quests works too, and so does a single quest object on its own.
 {
   "questWeaver": 1,
   "chain": { "id": "shadow-of-the-mire", "name": "Shadow of the Mire", "description": "..." },
-  "quests": [ { /* see below */ } ]
+  "quests": [ { /* see below */ } ],
+  "webs": [ { /* see Story webs */ } ]
 }
 ```
 
@@ -29,7 +30,8 @@ A bare array of quests works too, and so does a single quest object on its own.
 |---|---|
 | `questWeaver` | Format version. Omit it; it defaults to the current version. |
 | `chain` | Optional. Groups the quests so they can be exported together later. |
-| `quests` | The quests. Required. |
+| `quests` | The quests. Required unless the file has `webs`. |
+| `webs` | Optional. GM story webs, see below. `web` with a single object works too. |
 
 ### A quest
 
@@ -125,6 +127,65 @@ accepted too, for linking into quests that already exist.
 With *Advance quest chains automatically* enabled in settings, completing a quest promotes any
 draft whose `requires` are all now complete.
 
+## Story webs
+
+A web is a list of cards (`nodes`) and the connections between them (`edges`). Webs are GM-only
+and go into the vault, like everything else secret.
+
+```json
+"webs": [
+  {
+    "id": "mire-web",
+    "name": "Shadow of the Mire",
+    "description": "<p>Who is really behind the debts.</p>",
+    "nodes": [
+      { "quest": "mire-1", "x": 0, "y": 0 },
+      { "quest": "mire-2" },
+      { "id": "vex", "kind": "npc", "label": "Harbourmaster Vex", "notes": "Sank the bell himself." },
+      { "id": "guild", "kind": "faction", "label": "Smugglers' Guild", "tags": ["smugglers"] }
+    ],
+    "edges": [
+      { "from": "vex", "to": "mire-1", "type": "involves", "label": "gives the job" },
+      { "from": "vex", "to": "guild", "type": "owns" },
+      { "from": "mire-1", "to": "mire-2", "type": "unlocks" }
+    ]
+  }
+]
+```
+
+| Field | Default | Notes |
+|---|---|---|
+| `id` | derived from the name | **Use one.** Re-importing matches on it and updates the web. |
+| `name` | the chain's name | |
+| `description` | `""` | HTML. |
+| `nodes` | `[]` | The cards. |
+| `edges` | `[]` | The connections. |
+
+**Cards.** A card with `quest` shows that quest: the `id` of a quest in this file, the `id` a
+quest was imported under earlier, or a quest's UUID. Its name and colour come from the live
+quest. Any other card has a `kind`: `npc`, `faction`, `location`, `event`, `clue`, `secret` or
+`note` (the default), plus a `label`, and optionally `notes`, `tags`, `img` and `color`.
+
+A card's `id` is what edges refer to. It defaults to the quest's id for a quest card, and to the
+label otherwise (`Harbourmaster Vex` becomes `harbourmaster-vex`). `x` and `y` place it; leave them out and the importer arranges the cards the way
+**Arrange** does.
+
+**Connections.** `from` and `to` name a card by its `id` or label, or a quest card by its
+quest's id.
+`type` is one of `leadsTo` (the default), `involves`, `rival`, `owns`, `hidden`, `custom`,
+`requires` or `unlocks`; anything else is kept as a custom connection labelled with what you
+wrote. Optional `label`, `color` and `dashed` (on by default for `hidden`).
+
+`requires` and `unlocks` between two quest cards are written to the quests, exactly as when you
+draw one on the web, so the quest chain and the web stay one thing. `"from": "mire-2", "to":
+"mire-1", "type": "requires"` reads "mire-2 requires mire-1".
+
+**Re-importing** replaces the cards and connections the file made last time and leaves alone
+anything you added on the web by hand. A card the file gives no position keeps the one it has,
+so you can arrange the web in Foundry and keep iterating on the file.
+
+A file can hold only webs, with quest cards pointing at quests already in the world.
+
 ## Hidden content, honestly
 
 `hidden` and `gmNotes` keep content out of the quest document players receive. That stops it
@@ -134,12 +195,14 @@ the browser console open can still read it. See the module README.
 
 ## Export
 
-The Export tab writes this same format, so files round-trip. **Player-safe export** drops
-`gmNotes` and everything still in the vault, which is what you want before sharing a chain.
+The Export tab writes this same format, so files round-trip, story webs included. **Player-safe
+export** drops `gmNotes`, story webs and everything else still in the vault, which is what you want
+before sharing a chain.
 Right-click a quest in the log to export just that one.
 
 ## Worked example
 
 [`examples/example-chain.json`](../quest-weaver/examples/example-chain.json) is a three-quest chain
-using hidden tracks, hidden XP, a hidden custom reward and prerequisites. The Import tab's
+using hidden tracks, hidden XP, a hidden custom reward and prerequisites, with a story web of the
+people behind it. The Import tab's
 **Load the example** button pastes it in for you.

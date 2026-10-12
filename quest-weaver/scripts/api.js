@@ -11,7 +11,7 @@ import { StoryWebApp } from "./apps/story-web.js";
 import { StoryWeb } from "./core/story-web.js";
 import { ImportExportDialog, exportChain, exportQuest } from "./apps/import-export.js";
 import { parseImport } from "./io/schema.js";
-import { planImport, runImport } from "./io/importer.js";
+import { planImport, planWebs, runImport } from "./io/importer.js";
 import { buildExport } from "./io/exporter.js";
 import { Award } from "./rewards/award.js";
 import * as currency from "./rewards/currency.js";
@@ -59,10 +59,18 @@ export function buildApi() {
     openWeb: () => StoryWebApp.open(),
     /** Validate a payload without importing it. */
     parseImport,
-    /** Say what an import would do. */
+    /** Say what an import would do to quests. */
     planImport: (payload) => planImport(parseImport(payload).quests),
-    /** Import quests from JSON, a JSON string, or a parsed object. */
-    importQuests: (payload, options) => runImport(parseImport(payload).quests, options),
+    /** Say what an import would do to story webs. */
+    planWebs: (payload) => {
+      const parsed = parseImport(payload);
+      return planWebs(parsed.webs, parsed.quests);
+    },
+    /** Import quests and story webs from JSON, a JSON string, or a parsed object. */
+    importQuests: (payload, options) => {
+      const parsed = parseImport(payload);
+      return runImport(parsed.quests, { ...options, webs: parsed.webs });
+    },
     /** Build an export payload for the given quests. */
     buildExport,
     exportQuest: (uuid, options) => exportQuest(QuestRepository.get(uuid), options),

@@ -1,11 +1,13 @@
 /**
- * Quest Weaver: exporting quests and chains.
+ * Quest Weaver: exporting quests, chains and story webs.
  *
  * Writes the same shape the importer reads, so a file can round-trip. The
- * player-safe option drops everything still in the vault, which is what you want
- * before handing a chain to another GM's players or publishing it.
+ * player-safe option drops everything still in the vault, story webs included,
+ * which is what you want before handing a chain to another GM's players or
+ * publishing it.
  */
 
+import { FLAG, MODULE_ID, NODE_KIND } from "../config.js";
 import { QuestRepository } from "../core/quest-repository.js";
 import { FORMAT_VERSION } from "./schema.js";
 
@@ -16,9 +18,10 @@ import { FORMAT_VERSION } from "./schema.js";
  * @param {object} [options]
  * @param {boolean} [options.playerSafe]  Omit GM notes and vault content.
  * @param {object} [options.chain]        Chain metadata to stamp on the file.
+ * @param {JournalEntryPage[]} [options.webs]  Story webs to include. Never in a player-safe file.
  * @returns {object}
  */
-export function buildExport(quests, { playerSafe = false, chain = null } = {}) {
+export function buildExport(quests, { playerSafe = false, chain = null, webs = [] } = {}) {
   // Links are written as import ids so the file is portable between worlds.
   const idByUuid = new Map();
   for (const quest of quests) {
@@ -31,6 +34,55 @@ export function buildExport(quests, { playerSafe = false, chain = null } = {}) {
     exportedAt: new Date().toISOString(),
     ...(chain ? { chain } : {}),
     quests: quests.map((quest) => questToJSON(quest, { playerSafe, ref, idByUuid })),
+    ...(!playerSafe && webs.length ? { webs: webs.map((web) => webToJSON(web, idByUuid)) } : {}),
+  };
+}
+
+/**
+ * One story web. Quest cards name their quest by its id in this file, and the
+ * chain between quests is left to the quests' own links. A web that came from
+ * an import keeps its own and its nodes' ids, so the file updates it in place.
+ */
+function webToJSON(web, idByUuid) {
+  const s = web.system;
+  const imported = web.getFlag(MODULE_ID, FLAG.webImport);
+  const fileIdByReal = new Map((imported?.nodes ?? []).map(([file, real]) => [real, file]));
+
+  const nodes = [];
+  const nodeId = new Map();
+  for (const n of s.nodes) {
+    if (n.kind === NODE_KIND.quest && !idByUuid.has(n.ref)) continue; // Quest gone or not exported.
+    const id = fileIdByReal.get(n.id) ?? n.id;
+    nodeId.set(n.id, id);
+    nodes.push({
+      id,
+      ...(n.kind === NODE_KIND.quest ? { quest: idByUuid.get(n.ref) } : { kind: n.kind, label: n.label }),
+      x: Math.round(n.x),
+      y: Math.round(n.y),
+      ...(n.img ? { img: n.img } : {}),
+      ...(n.color ? { color: n.color } : {}),
+      ...(n.notes ? { notes: n.notes } : {}),
+      ...(n.tags.length ? { tags: [...n.tags] } : {}),
+    });
+  }
+
+  const edges = s.edges
+    .filter((e) => nodeId.has(e.from) && nodeId.has(e.to))
+    .map((e) => ({
+      from: nodeId.get(e.from),
+      to: nodeId.get(e.to),
+      type: e.type,
+      ...(e.label ? { label: e.label } : {}),
+      ...(e.color ? { color: e.color } : {}),
+      ...(e.dashed ? { dashed: true } : {}),
+    }));
+
+  return {
+    id: imported?.importId || web.name.slugify({ strict: true }) || web.id,
+    name: web.name,
+    ...(s.description ? { description: s.description } : {}),
+    nodes,
+    ...(edges.length ? { edges } : {}),
   };
 }
 

@@ -10,7 +10,7 @@
  * can show the GM what will happen before anything is created.
  */
 
-import { STATUS, STATUS_LIST } from "../config.js";
+import { EDGE_TYPE, NODE_KIND, STATUS, STATUS_LIST } from "../config.js";
 import { newId } from "../data/fields.js";
 import { denominations } from "../settings.js";
 
@@ -24,12 +24,22 @@ const asInt = (v) => {
   const n = Number(v);
   return Number.isFinite(n) ? Math.round(n) : 0;
 };
+/** A number, or null when there is none, so "no position" differs from 0. */
+const asNumber = (v) => {
+  if (v == null || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+const NODE_KINDS = new Set(Object.values(NODE_KIND));
+const EDGE_TYPES = new Set(Object.values(EDGE_TYPE));
+const CHAIN_TYPES = new Set([EDGE_TYPE.requires, EDGE_TYPE.unlocks]);
 
 /**
  * Parse and normalise an import payload.
  *
  * @param {object|string} raw  Parsed JSON, or a JSON string.
- * @returns {{quests: object[], chain: object|null, storyNodes: object[], edges: object[],
+ * @returns {{quests: object[], chain: object|null, webs: object[],
  *            errors: string[], warnings: string[]}}
  */
 export function parseImport(raw) {
@@ -41,20 +51,21 @@ export function parseImport(raw) {
     try {
       data = JSON.parse(raw);
     } catch (err) {
-      return { quests: [], chain: null, storyNodes: [], edges: [], errors: [
+      return { quests: [], chain: null, webs: [], errors: [
         game.i18n.format("QW.IO.BadJSON", { message: err.message }),
       ], warnings };
     }
   }
 
   if (!data || typeof data !== "object") {
-    return { quests: [], chain: null, storyNodes: [], edges: [],
+    return { quests: [], chain: null, webs: [],
       errors: [game.i18n.localize("QW.IO.NotAnObject")], warnings };
   }
 
-  // A bare array of quests, or a single quest, is accepted as a convenience.
+  // A bare array of quests, a single quest, or a single web is accepted as a convenience.
   if (Array.isArray(data)) data = { quests: data };
-  if (data.name && !data.quests) data = { quests: [data] };
+  if (Array.isArray(data.nodes) && !data.quests && !data.webs) data = { webs: [data] };
+  if (data.name && !data.quests && !data.webs) data = { quests: [data] };
 
   const version = asInt(data.questWeaver ?? FORMAT_VERSION);
   if (version > FORMAT_VERSION) {
@@ -78,7 +89,6 @@ export function parseImport(raw) {
     if (quest) quests.push(quest);
   });
 
-  if (!quests.length && !errors.length) errors.push(game.i18n.localize("QW.IO.NoQuests"));
 
   // Links that point at nothing are dropped, not silently kept, because
   // a dangling prerequisite would quietly stall a chain.
@@ -99,13 +109,136 @@ export function parseImport(raw) {
     }
   }
 
+  const webs = [];
+  const seenWebIds = new Set();
+  [...asArray(data.webs), ...asArray(data.web)].forEach((entry, index) => {
+    const web = parseWeb(entry, index, { chain, errors, warnings, seenWebIds });
+    if (web) webs.push(web);
+  });
+
+  if (!quests.length && !webs.length && !errors.length) {
+    errors.push(game.i18n.localize("QW.IO.NoQuests"));
+  }
+
+  return { quests, chain, webs, errors, warnings };
+}
+
+/**
+ * Normalise one story web.
+ *
+ * Node and edge ids stay as written: they only join the lists inside this file,
+ * and the importer maps them to real ids. A quest node keeps its quest reference
+ * unresolved, because it may name a quest already in the world rather than one
+ * in this file, and only the importer can look there.
+ */
+function parseWeb(entry, index, { chain, errors, warnings, seenWebIds }) {
+  if (!entry || typeof entry !== "object") {
+    errors.push(game.i18n.format("QW.IO.BadWeb", { index: index + 1 }));
+    return null;
+  }
+
+  const name = asString(entry.name).trim() || chain?.name || game.i18n.localize("QW.Web.Untitled");
+  const importId = asString(entry.id).trim() || `qw-web-${index}-${name.slugify({ strict: true })}`;
+  if (seenWebIds.has(importId)) {
+    warnings.push(game.i18n.format("QW.IO.DuplicateWebId", { id: importId }));
+  }
+  seenWebIds.add(importId);
+
+  const nodes = [];
+  const byId = new Map();
+  asArray(entry.nodes).forEach((n, i) => {
+    if (!n || typeof n !== "object") {
+      warnings.push(game.i18n.format("QW.IO.BadNode", { web: name, index: i + 1 }));
+      return;
+    }
+
+    const quest = asString(n.quest ?? (n.kind === NODE_KIND.quest ? n.ref : "")).trim();
+    const label = asString(n.label ?? n.name);
+    let kind = quest ? NODE_KIND.quest : asString(n.kind).trim() || NODE_KIND.note;
+    if (!NODE_KINDS.has(kind)) {
+      warnings.push(game.i18n.format("QW.IO.UnknownNodeKind", { web: name, node: label, kind }));
+      kind = NODE_KIND.note;
+    }
+    if (kind === NODE_KIND.quest && !quest) {
+      warnings.push(game.i18n.format("QW.IO.QuestNodeWithoutQuest", { web: name, index: i + 1 }));
+      return;
+    }
+
+    // A quest card is known by its quest's id unless it says otherwise, so edges
+    // can name quests directly.
+    const id = asString(n.id).trim() || quest || label.slugify({ strict: true }) || `node-${i}`;
+    if (byId.has(id)) {
+      warnings.push(game.i18n.format("QW.IO.DuplicateNodeId", { web: name, id }));
+      return;
+    }
+
+    const node = {
+      importId: id,
+      kind,
+      quest,
+      label,
+      img: asString(n.img),
+      color: asString(n.color),
+      notes: asString(n.notes),
+      tags: asArray(n.tags).map(asString).filter(Boolean),
+      x: asNumber(n.x),
+      y: asNumber(n.y),
+    };
+    byId.set(id, node);
+    nodes.push(node);
+  });
+
+  // An edge end may name a node by id or label, or a quest that has a card on this web.
+  const slug = (text) => text.slugify({ strict: true });
+  const byQuest = new Map(nodes.filter((n) => n.quest).map((n) => [n.quest, n]));
+  const byLabel = new Map(nodes.filter((n) => n.label).map((n) => [slug(n.label), n]));
+  const endpoint = (ref) => byId.get(ref) ?? byQuest.get(ref) ?? byLabel.get(slug(ref)) ?? null;
+
+  const edges = [];
+  const chainLinks = [];
+  asArray(entry.edges).forEach((e) => {
+    const fromRef = asString(e?.from).trim();
+    const toRef = asString(e?.to).trim();
+    const from = endpoint(fromRef);
+    const to = endpoint(toRef);
+    if (!from || !to) {
+      warnings.push(game.i18n.format("QW.IO.UnknownEdgeEnd", { web: name, from: fromRef, to: toRef }));
+      return;
+    }
+    if (from === to) return;
+
+    // Anything not a known relationship is kept as a custom one, labelled with
+    // what the file called it.
+    let type = asString(e.type).trim() || EDGE_TYPE.leadsTo;
+    let label = asString(e.label);
+    if (!EDGE_TYPES.has(type)) {
+      label ||= type;
+      type = EDGE_TYPE.custom;
+    }
+
+    // The chain between two quests belongs on the quests, as on the web itself.
+    if (CHAIN_TYPES.has(type) && from.quest && to.quest) {
+      chainLinks.push({ from: from.quest, to: to.quest, type });
+      return;
+    }
+
+    edges.push({
+      from: from.importId,
+      to: to.importId,
+      type,
+      label,
+      color: asString(e.color),
+      dashed: e.dashed == null ? type === EDGE_TYPE.hidden : asBool(e.dashed),
+    });
+  });
+
   return {
-    quests,
-    chain,
-    storyNodes: asArray(data.storyNodes),
-    edges: asArray(data.edges),
-    errors,
-    warnings,
+    importId,
+    name,
+    description: asString(entry.description),
+    nodes,
+    edges,
+    chainLinks,
   };
 }
 

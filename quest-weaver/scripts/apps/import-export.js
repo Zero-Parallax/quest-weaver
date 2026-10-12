@@ -8,9 +8,11 @@
 
 import { MODULE_ID, OWNERSHIP } from "../config.js";
 import { QuestRepository } from "../core/quest-repository.js";
+import { StoryWeb } from "../core/story-web.js";
 import { buildExport, downloadJSON, exportableQuests } from "../io/exporter.js";
-import { planImport, runImport } from "../io/importer.js";
+import { planImport, planWebs, runImport } from "../io/importer.js";
 import { parseImport } from "../io/schema.js";
+import { StoryWebApp } from "./story-web.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -57,6 +59,9 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
   /** Per-quest plan rows from the last parse. */
   #plan = [];
 
+  /** Per-web plan rows from the last parse. */
+  #webPlan = [];
+
   /** Toggled from the template by name, so these are deliberately not private. */
   updateExisting = true;
   startHidden = true;
@@ -75,20 +80,24 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const quests = exportableQuests();
+    const rows = [...this.#plan, ...this.#webPlan];
 
     return Object.assign(context, {
       text: this.#text,
       parsed: this.#parsed,
       plan: this.#plan,
+      webPlan: this.#webPlan,
+      hasPlan: rows.length > 0,
       updateExisting: this.updateExisting,
       startHidden: this.startHidden,
       playerSafe: this.playerSafe,
-      canImport: !!this.#parsed && !this.#parsed.errors.length && this.#plan.length > 0,
+      canImport: !!this.#parsed && !this.#parsed.errors.length && rows.length > 0,
       counts: {
-        create: this.#plan.filter((p) => p.action === "create").length,
-        update: this.#plan.filter((p) => p.action === "update").length,
+        create: rows.filter((p) => p.action === "create").length,
+        update: rows.filter((p) => p.action === "update").length,
       },
       exportCount: quests.length,
+      exportWebCount: game.user.isGM && !this.playerSafe ? StoryWeb.all().length : 0,
       isGM: game.user.isGM,
     });
   }
@@ -105,6 +114,7 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
         if (this.#parsed) {
           this.#parsed = null;
           this.#plan = [];
+          this.#webPlan = [];
           this.render();
         }
       });
@@ -133,10 +143,13 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
     if (!this.#text.trim()) {
       this.#parsed = null;
       this.#plan = [];
+      this.#webPlan = [];
       return this.render();
     }
     this.#parsed = parseImport(this.#text);
-    this.#plan = this.#parsed.errors.length ? [] : planImport(this.#parsed.quests);
+    const ok = !this.#parsed.errors.length;
+    this.#plan = ok ? planImport(this.#parsed.quests) : [];
+    this.#webPlan = ok ? planWebs(this.#parsed.webs, this.#parsed.quests) : [];
     this.render();
   }
 
@@ -152,6 +165,7 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
     this.#text = "";
     this.#parsed = null;
     this.#plan = [];
+    this.#webPlan = [];
     this.render();
   }
 
@@ -159,15 +173,17 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
     if (!this.#parsed || this.#parsed.errors.length) return;
     try {
       const result = await runImport(this.#parsed.quests, {
+        webs: this.#parsed.webs,
         update: this.updateExisting,
         ownership: this.startHidden ? OWNERSHIP.NONE : OWNERSHIP.OBSERVER,
       });
-      ui.notifications.info(
-        game.i18n.format("QW.IO.Imported", { created: result.created, updated: result.updated }),
-      );
+      const key = this.#webPlan.length ? "QW.IO.ImportedWithWebs" : "QW.IO.Imported";
+      ui.notifications.info(game.i18n.format(key, result));
+      if (result.websCreated) StoryWebApp.rerender();
       this.#text = "";
       this.#parsed = null;
       this.#plan = [];
+      this.#webPlan = [];
       this.render();
     } catch (err) {
       ui.notifications.error(err.message);
@@ -177,13 +193,18 @@ export class ImportExportDialog extends HandlebarsApplicationMixin(ApplicationV2
 
   static #onExportAll() {
     const quests = exportableQuests();
-    if (!quests.length) return ui.notifications.info(game.i18n.localize("QW.IO.NothingToExport"));
+    // Webs live in the vault, so a player-safe file never carries them.
+    const webs = game.user.isGM && !this.playerSafe ? StoryWeb.all() : [];
+    if (!quests.length && !webs.length) {
+      return ui.notifications.info(game.i18n.localize("QW.IO.NothingToExport"));
+    }
 
-    const payload = buildExport(quests, { playerSafe: this.playerSafe });
+    const payload = buildExport(quests, { playerSafe: this.playerSafe, webs });
     const stamp = new Date().toISOString().slice(0, 10);
     const suffix = this.playerSafe ? "-player-safe" : "";
     downloadJSON(payload, `quest-weaver-${game.world.id}-${stamp}${suffix}.json`);
-    ui.notifications.info(game.i18n.format("QW.IO.Exported", { count: quests.length }));
+    const key = webs.length ? "QW.IO.ExportedWithWebs" : "QW.IO.Exported";
+    ui.notifications.info(game.i18n.format(key, { count: quests.length, webs: webs.length }));
   }
 
   /** Drop a worked example into the paste box so the shape is obvious. */
