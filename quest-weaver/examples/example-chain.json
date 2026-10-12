@@ -72,5 +72,28 @@
       },
       "links": { "requires": ["mire-2"] }
     }
+  ],
+  "webs": [
+    {
+      "id": "mire-web",
+      "name": "Shadow of the Mire",
+      "description": "<p>Who is really behind the debts, and how the party finds out.</p>",
+      "nodes": [
+        { "quest": "mire-1" },
+        { "quest": "mire-2" },
+        { "quest": "mire-3" },
+        { "id": "vex", "kind": "npc", "label": "Harbourmaster Vex", "notes": "Sank the bell to cover a smuggling run." },
+        { "id": "patron", "kind": "npc", "label": "The Patron", "tags": ["villain"] },
+        { "id": "guild", "kind": "faction", "label": "Smugglers' Guild" },
+        { "id": "cut-rope", "kind": "clue", "label": "The cut rope" }
+      ],
+      "edges": [
+        { "from": "vex", "to": "mire-1", "type": "involves", "label": "gives the job" },
+        { "from": "vex", "to": "guild", "type": "owns", "label": "owes" },
+        { "from": "cut-rope", "to": "vex", "type": "hidden", "label": "points to" },
+        { "from": "patron", "to": "mire-2", "type": "involves", "label": "is the buyer" },
+        { "from": "patron", "to": "guild", "type": "rival" }
+      ]
+    }
   ]
 }

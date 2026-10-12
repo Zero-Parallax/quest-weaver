@@ -89,6 +89,12 @@ export class StoryWebApp extends HandlebarsApplicationMixin(ApplicationV2) {
     if (app?.rendered) app.redraw();
   }
 
+  /** Re-render the whole window if it is open, so a new web shows in its picker. */
+  static rerender() {
+    const app = StoryWebApp.#instance;
+    if (app?.rendered) app.render();
+  }
+
   get web() {
     return this.#webUuid ? StoryWeb.get(this.#webUuid) : null;
   }

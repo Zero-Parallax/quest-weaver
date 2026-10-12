@@ -17,4 +17,6 @@ First build. Foundry VTT v14 only.
   player-safe export
 - A GM-only story web: quests and free-form nodes on a pan/zoom canvas, with the quest chain
   derived from the quests themselves and editable by drawing links between cards
+- Story webs in the JSON import and export: preview, re-import that updates in place and keeps
+  what the GM added by hand, and automatic layout for cards without a position
 - Trusted players can propose quests of their own to track

@@ -48,7 +48,14 @@
       <p class="qw-io-warning"><i class="fa-solid fa-triangle-exclamation"></i> {{this}}</p>
       {{/each}}
 
-      {{#if plan.length}}
+      {{#each webPlan}}
+        {{#each this.missing}}
+        <p class="qw-io-warning"><i class="fa-solid fa-triangle-exclamation"></i>
+          {{localize "QW.IO.MissingWebQuest" web=../name quest=this}}</p>
+        {{/each}}
+      {{/each}}
+
+      {{#if hasPlan}}
       <fieldset>
         <legend>
           {{localize "QW.IO.WillDo"}}
@@ -57,6 +64,7 @@
             {{localize "QW.IO.CountUpdate"}} {{counts.update}}
           </span>
         </legend>
+        {{#if plan.length}}
         <table class="qw-io-table">
           <thead>
             <tr>
@@ -86,6 +94,30 @@
             {{/each}}
           </tbody>
         </table>
+        {{/if}}
+
+        {{#if webPlan.length}}
+        <table class="qw-io-table">
+          <thead>
+            <tr>
+              <th>{{localize "QW.IO.StoryWeb"}}</th>
+              <th>{{localize "QW.IO.ActionHeader"}}</th>
+              <th>{{localize "QW.IO.Nodes"}}</th>
+              <th>{{localize "QW.IO.Connections"}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each webPlan}}
+            <tr class="qw-io-row is-{{this.action}}">
+              <td>{{this.name}}</td>
+              <td><span class="qw-io-badge">{{localize (concat "QW.IO.Action." this.action)}}</span></td>
+              <td class="qw-award-num">{{this.nodes}}</td>
+              <td class="qw-award-num">{{this.edges}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{/if}}
 
         <div class="qw-io-options">
           <label>
@@ -127,7 +159,8 @@
     <div class="qw-io-actions">
       <button type="button" class="qw-add-btn qw-accept" data-action="exportAll">
         <i class="fa-solid fa-file-export"></i>
-        {{localize "QW.IO.ExportAll"}} ({{exportCount}})
+        {{localize "QW.IO.ExportAll"}} ({{exportCount}}){{#if exportWebCount}}
+        {{localize "QW.IO.ExportWebs" count=exportWebCount}}{{/if}}
       </button>
     </div>
 

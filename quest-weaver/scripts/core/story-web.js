@@ -226,7 +226,7 @@ export class StoryWeb {
     if (!from || !to) return null;
 
     if (CHAIN_TYPES.has(type) && from.kind === NODE_KIND.quest && to.kind === NODE_KIND.quest) {
-      return StoryWeb.#linkQuests(from.ref, to.ref, type);
+      return StoryWeb.linkQuests(from.ref, to.ref, type);
     }
 
     source.edges.push({
@@ -242,8 +242,11 @@ export class StoryWeb {
     return true;
   }
 
-  /** Write a prerequisite relationship onto the quest documents themselves. */
-  static async #linkQuests(fromUuid, toUuid, type) {
+  /**
+   * Write a prerequisite relationship onto the quest documents themselves.
+   * `requires` reads "from requires to"; `unlocks` reads "from unlocks to".
+   */
+  static async linkQuests(fromUuid, toUuid, type) {
     const earlier = type === EDGE_TYPE.unlocks ? fromUuid : toUuid;
     const later = type === EDGE_TYPE.unlocks ? toUuid : fromUuid;
 

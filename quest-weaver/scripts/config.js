@@ -119,10 +119,11 @@ export const SETTING = {
   schemaVersion: "schemaVersion",
 };
 
-/** Flag scope used on the container JournalEntry of every quest. */
+/** Flag keys: on the container JournalEntry of every quest, the vault, and imported webs. */
 export const FLAG = {
   isQuestEntry: "questEntry",
   isVault: "vault",
+  webImport: "webImport",
 };
 
 /**

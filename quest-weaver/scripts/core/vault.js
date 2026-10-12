@@ -79,12 +79,17 @@ export class Vault {
     return Vault.pages(TYPE.storyweb).sort((a, b) => a.sort - b.sort);
   }
 
-  /** Create a new, empty story web. */
-  static async createWeb(name) {
+  /** Create a new story web, empty unless `system` or `flags` are given. */
+  static async createWeb(name, { system, flags } = {}) {
     const entry = await Vault.ensure();
     if (!entry) return null;
     const [page] = await JournalEntryPage.implementation.create(
-      [{ name: name || game.i18n.localize("QW.Web.Untitled"), type: TYPE.storyweb }],
+      [{
+        name: name || game.i18n.localize("QW.Web.Untitled"),
+        type: TYPE.storyweb,
+        ...(system ? { system } : {}),
+        ...(flags ? { flags } : {}),
+      }],
       { parent: entry },
     );
     return page;

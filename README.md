@@ -31,8 +31,8 @@ Early development. Working today:
 - Award loot: split currency and XP across the party, assign items per character, with a
   preview of exactly what each person gets before anything is written
 - Configurable currency denominations, auto-detected per game system
-- Import and export quests and whole chains as JSON, with a preview before anything is created
-  and a player-safe export that drops everything in the vault
+- Import and export quests, whole chains and story webs as JSON, with a preview before anything
+  is created and a player-safe export that drops everything in the vault
 - A **Who can see this quest** control on the sheet: everyone, or named players
 - Trusted players can propose quests of their own to track, tagged and visible only to them
 - A GM-only **story web**: quests and free-form nodes on a pan/zoom canvas, with the quest chain
@@ -92,8 +92,12 @@ dialog shows every quest it found, whether it will be created or updated, and an
 not understand. Re-importing the same file updates the quests it made last time instead of
 duplicating them, so you can iterate on a draft.
 
+The same file can carry story webs: cards for the quests and for NPCs, factions, places and clues,
+and the connections between them. They are previewed and re-imported the same way, and cards
+without a position are arranged for you.
+
 The format is documented in [docs/quest-json-schema.md](docs/quest-json-schema.md), and
-**Load the example** in the dialog pastes in a worked three-quest chain. It is deliberately simple
+**Load the example** in the dialog pastes in a worked three-quest chain with its story web. It is deliberately simple
 enough to hand to an AI: ask for quests in that shape, paste the result, preview, import.
 
 ### Posting to the Job Board
